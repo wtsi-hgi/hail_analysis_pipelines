@@ -10,9 +10,9 @@ project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
 
 
-storage = os.path.join(project_root , "config-files/storage.json")
+storage = os.path.join(project_root , "config_files/storage.json")
 
-thresholds = os.path.join(project_root, "config-files/thresholds.json")
+thresholds = os.path.join(project_root, "config_files/thresholds.json")
 
 with open(f"{storage}", 'r') as f:
     storage = json.load(f)
