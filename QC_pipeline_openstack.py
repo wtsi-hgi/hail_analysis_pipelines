@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
 
     print(f"Reading {CHROMOSOME} mt")
-    mt = hl.read_matrix_table(f"{storage['s3']['matrixtables']}/{CHROMOSOME}.mt")
+    mt = hl.read_matrix_table(f"{storage['s3']['newmatrixtables']}/{CHROMOSOME}.mt")
 
     print("Splitting mt and writing out split mt")
     mt_split = hl.split_multi_hts(mt, keep_star=False)
@@ -85,18 +85,26 @@ if __name__ == "__main__":
     print("Finished annotating rows, annotating columns now")
     mt_sqc1_unfiltered = mt.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt.s])
     mt_sqc2_unfiltered = hl.sample_qc(mt_sqc1_unfiltered, name='sample_QC_Hail')
+
     panda_df_unfiltered_table = mt_sqc2_unfiltered.cols().flatten()
 
     print("Outputting table of sample qc")
     panda_df_unfiltered_table.export(f"{tmp_dir}/output-tables/{CHROMOSOME}_sampleQC_unfiltered.tsv.bgz", header=True)
 
-    mt2 = hl.variant_qc(mt, name='variant_QC_Hail')
+    #Variant QC
+    mt2 = hl.variant_qc(mt_sqc2_unfiltered, name='variant_QC_Hail')
 
     print('Exporting variant qc pandas table to disk')
     mt_rows = mt2.rows()
-    mt_rows.select(mt_rows.variant_QC_Hail).flatten().export(f"{tmp_dir}/output-tables/{CHROMOSOME}-variantQC_unfiltered_pandaDF.tsv.bgz",
+    mt_rows.select(mt_rows.variant_QC_Hail).flatten().export(f"{tmp_dir}/output-tables/{CHROMOSOME}_variantQC_unfiltered.tsv.bgz",
                                                              header=True)
 
+
+    #####################################################################
+    ###################### START FILTERING ##############################
+    #####################################################################
+
+    ######## VQSR filtering
     print("Annotation VQSLOD snp and indel scores")
     mt = mt.annotate_rows(VQSLOD_SNP=VQSLOD_snps.key_by("Locus")[mt.locus])
     mt = mt.annotate_rows(VQSLOD_INDEL=VQSLOD_indels.key_by("Locus")[mt.locus])
@@ -115,23 +123,21 @@ if __name__ == "__main__":
     mt1 = mt_vqslod_filtered.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_vqslod_filtered_checkpoint.mt", overwrite=True)
     print("Finished writing vqslod filtered matrixtable")
 
-    print("Annotating columns with sample qc")
-    mt_sqc1 = mt1.annotate_cols(
-                sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt1.s])
+    ########### Sample QC filtering
     print("Filtering on sample qc")
-    mt_sqc1_filtered = mt_sqc1.filter_cols(
-                (mt_sqc1.sample_QC_nonHail.PASS_Depth == 1 ) &
-                (mt_sqc1.sample_QC_nonHail.PASS_ID == 1) &
-                (mt_sqc1.sample_QC_nonHail.PASS_Median_FreeMix == 1) &
-                (mt_sqc1.sample_QC_nonHail.PASS_NRD == 1) &
-                (mt_sqc1.sample_QC_nonHail.PASS_SampleSwap == 1) &
-                (mt_sqc1.sample_QC_nonHail.PASS_Sex == 1) &
-                (mt_sqc1.sample_QC_nonHail.PASS_DUP == 1)
+    mt_sqc1_filtered = mt1.filter_cols(
+                (mt1.sample_QC_nonHail.PASS_Depth == 1 ) &
+                (mt1.sample_QC_nonHail.PASS_ID == 1) &
+                (mt1.sample_QC_nonHail.PASS_Median_FreeMix == 1) &
+                (mt1.sample_QC_nonHail.PASS_NRD == 1) &
+                (mt1.sample_QC_nonHail.PASS_SampleSwap == 1) &
+                (mt1.sample_QC_nonHail.PASS_Sex == 1) &
+                (mt1.sample_QC_nonHail.PASS_DUP == 1)
             )
     print("Writing out filtered sample qc checkpoint")
     mt_sqc2 = hl.sample_qc(mt_sqc1_filtered, name='sample_QC_Hail')
 
-    mt_sqc2 = mt_sqc2.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_checkpoint.mt",
+    mt_sqc2 = mt_sqc2.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_filtered_checkpoint.mt",
                                           overwrite=True)
     filter_sampleqc_table = mt_sqc2.cols().flatten()
     filter_sampleqc_table.export(f"{tmp_dir}/output-tables/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
