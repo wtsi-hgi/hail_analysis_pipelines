@@ -54,6 +54,11 @@ if __name__ == "__main__":
     sample_QC_nonHail = hl.import_table(storage.intervalwgs.s3.sampleQC_non_hail, impute=True)
 
 
+
+    #####################################################################
+    ###################### INPUT DATA  ##############################
+    #####################################################################
+
     print(f"Reading {CHROMOSOME} mt")
     mt = hl.read_matrix_table(f"{storage['s3']['newmatrixtables']}/{CHROMOSOME}.mt")
 
@@ -64,11 +69,10 @@ if __name__ == "__main__":
     mt_split = mt_split.checkpoint(f"{tmp_dir}/matrixtable/{CHROMOSOME}-split-multi.mt",  overwrite=True)
     print("Finished splitting and writing mt. ")
 
-    #print("Repartitioning to 1000 partitions ")
-    #mt_split = mt_split.naive_coalesce(1000)
 
-
-
+    #####################################################################
+    ###################### UNFILTERED SAMPLE AND VARIANT QC #############
+    #####################################################################
 
 
     print('Annotating rows with snp and indel info')
@@ -81,7 +85,7 @@ if __name__ == "__main__":
                                                                 mt_split.alleles[1]), "INDEL",
                                                  "Other"))))
 
-            # Unfiltered data summary stats:
+    # Unfiltered data summary stats:
     print("Finished annotating rows, annotating columns now")
     mt_sqc1_unfiltered = mt.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt.s])
     mt_sqc2_unfiltered = hl.sample_qc(mt_sqc1_unfiltered, name='sample_QC_Hail')
@@ -150,9 +154,16 @@ if __name__ == "__main__":
                 (mt_sqc_vqc.variant_QC_Hail.p_value_hwe >= 10 ** -6))
 
 
+
+    #####################################################################
+    ###################### FINAL QC AFTER FILTERING  ####################
+    #####################################################################
+
     fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
 
     mt1 = mt_sqc_vqc_filtered.drop(*fields_to_drop)
+
+
 
     mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
