@@ -9,8 +9,10 @@ import os
 import hail as hl
 import pyspark
 import json
+import sys
 
-CHROMOSOME="chrY"
+
+
 
 project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
@@ -58,7 +60,8 @@ if __name__ == "__main__":
     #####################################################################
     ###################### INPUT DATA  ##############################
     #####################################################################
-
+    #Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
+    CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
     mt = hl.read_matrix_table(f"{storage['s3']['newmatrixtables']}/{CHROMOSOME}.mt")
 
