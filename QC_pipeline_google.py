@@ -7,18 +7,18 @@ date: 22/07/19
 
 import os
 import hail as hl
-
+import sys
 import json
 
-CHROMOSOME="chrY"
+CHROMOSOME="chr20"
 
 project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
 
 
-storage = os.path.join(project_root , "config_files/storage.json")
+storage =  "gs://pa10/config_files/storage.json"
 
-thresholds = os.path.join(project_root, "config_files/thresholds.json")
+thresholds = "gs://pa10/config_files/thresholds.json"
 
 with open(f"{storage}", 'r') as f:
     storage = json.load(f)
@@ -28,7 +28,6 @@ with open(f"{thresholds}", 'r') as f:
 
 BUCKET = storage['intervalwgs']['google']['bucket']
 #Define chromosome here
-CHROMOSOME="chr1"
 tmp_dir=storage['intervalwgs']['google']['tmp_dir']
 
 if __name__ == "__main__":
@@ -36,117 +35,157 @@ if __name__ == "__main__":
     #Define the hail persistent storage directory
     hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
 
-    VQSLOD_snps = hl.import_table(f"{BUCKET}/qc-files/VQSLOD_snps.bgz",
+
+    #1. Import required files
+    print("1. import required tables in hail for the project.")
+    VQSLOD_snps = hl.import_table(storage["intervalwgs"]["google"]["vqsr_snp"],
                                   types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    VQSLOD_indels = hl.import_table(f"{BUCKET}/qc-files/VQSLOD_indels.bgz",
+    VQSLOD_indels = hl.import_table(storage["intervalwgs"]["google"]["vqsr_indel"],
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    sample_QC_nonHail = hl.import_table(f"{BUCKET}/qc-files/INTERVAL_WGS_Sample_QC_28-05-2019_fixed_header.txt",
-                                        impute=True)
-    gws_gwa_map = hl.import_table(f"{BUCKET}/qc-files/WGS-2-GWA_omicsMap.txt", impute=True)
+    sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["google"]["sampleQC_non_hail"], impute=True)
 
-    full_blood_count = hl.import_table(f"{BUCKET}/qc-files/Int50kSampleId.tsv", impute=True, key='Wgs_RAW_bl')
+    #####################################################################
+    ###################### INPUT DATA  ##############################
+    #####################################################################
+    # Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
+    CHROMOSOME = sys.argv[1]
+    print(f"Reading {CHROMOSOME} mt")
+    mt = hl.read_matrix_table(f"{BUCKET['intervalwgs']['s3']['newmatrixtables']}/{CHROMOSOME}.mt")
 
+    print("Splitting mt and writing out split mt")
+    mt_split = hl.split_multi_hts(mt, keep_star=False)
 
-    print('Joining annotations')
-    ja = sample_QC_nonHail.key_by('ID')
-    gws_gwa_map = gws_gwa_map.key_by('unique_WGS_ID')
+    mt_split = mt_split.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt", overwrite=True)
+    print("Finished splitting and writing mt. ")
 
-    ja = ja.annotate(gws_gwa_map=gws_gwa_map[ja['ID']])
-    fbc = full_blood_count.key_by('Wgs_RAW_bl')
-    ja = ja.annotate(fbc=full_blood_count[ja.gws_gwa_map.Wgs_RAW_bl])
+    #####################################################################
+    ###################### UNFILTERED SAMPLE AND VARIANT QC #############
+    #####################################################################
 
+    print('Annotating rows with snp and indel info')
+    mt = mt_split.annotate_rows(
+        Variant_Type=hl.cond((hl.is_snp(mt_split.alleles[0], mt_split.alleles[1])), "SNP",
+                             hl.cond(
+                                 hl.is_insertion(mt_split.alleles[0], mt_split.alleles[1]),
+                                 "INDEL",
+                                 hl.cond(hl.is_deletion(mt_split.alleles[0],
+                                                        mt_split.alleles[1]), "INDEL",
+                                         "Other"))))
 
-    print(f'Read {CHROMOSOME} mt ')
-    mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
-    ####################################################################
-    print('Split multialleles')
-    mt_split1=hl.split_multi_hts(mt, keep_star=False)
-    print('checkpoint split matrixtable')
-    mt_split = mt_split1.checkpoint( f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt", overwrite= True)
-
-    #print('coalesce partition')
-    # #mt_split = mt_split1.naive_coalesce(10000)
-    #print('coalesce checkpoint')
-    #mt_split= mt_split.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_coalesce_checkpoint.mt", overwrite = True)
-
-    print('Annotate matrixtable with snp indel and other information')
-    mt = mt_split.annotate_rows(Variant_Type=hl.cond((hl.is_snp(mt_split.alleles[0], mt_split.alleles[1])), "SNP",
-                                                         hl.cond(
-                                                             hl.is_insertion(mt_split.alleles[0], mt_split.alleles[1]),
-                                                             "INDEL",
-                                                             hl.cond(hl.is_deletion(mt_split.alleles[0],
-                                                                                    mt_split.alleles[1]), "INDEL",
-                                                                     "Other"))))
-
-    #Unfiltered data summary stats:
-    print('Unfiltered sample qc and write to google bucket')
+    # Unfiltered data summary stats:
+    print("Finished annotating rows, annotating columns now")
     mt_sqc1_unfiltered = mt.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt.s])
     mt_sqc2_unfiltered = hl.sample_qc(mt_sqc1_unfiltered, name='sample_QC_Hail')
-    panda_df_unfiltered_table = mt_sqc2_unfiltered.cols().flatten()
-    print('Export to table')
-    panda_df_unfiltered_table.export(f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_unfiltered.tsv.bgz", header=True)
 
-    print('VQSLOD scores filtering')
+    panda_df_unfiltered_table = mt_sqc2_unfiltered.cols().flatten()
+
+    print("Outputting table of sample qc")
+    panda_df_unfiltered_table.export(f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}_sampleQC_unfiltered.tsv.bgz", header=True)
+
+    # Variant QC
+    mt2 = hl.variant_qc(mt_sqc2_unfiltered, name='variant_QC_Hail')
+
+    print('Exporting variant qc pandas table to disk')
+    mt_rows = mt2.rows()
+    mt_rows.select(mt_rows.variant_QC_Hail).flatten().export(
+        f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}_variantQC_unfiltered.tsv.bgz",
+        header=True)
+
+    #####################################################################
+    ###################### START FILTERING ##############################
+    #####################################################################
+
+    ######## VQSR filtering
+    print("Annotation VQSLOD snp and indel scores")
     mt = mt.annotate_rows(VQSLOD_SNP=VQSLOD_snps.key_by("Locus")[mt.locus])
     mt = mt.annotate_rows(VQSLOD_INDEL=VQSLOD_indels.key_by("Locus")[mt.locus])
+
+    print("Filtering on VQSLOD scores")
     vqslod_filtered = (
-            hl.case()
-                .when((mt.Variant_Type == "SNP"), (mt.VQSLOD_SNP.VQSLOD >= thresholds['intervalwgs']['snp_vqsr_threshold']))
-                .when((mt.Variant_Type == "INDEL"), (mt.VQSLOD_INDEL.VQSLOD >= thresholds['intervalwgs']['indel_vqsr_threshold']))
-                .default(False)  # remove everything else
-        )
-
-    mt_vqslod_filtered = mt.filter_rows(vqslod_filtered)
-
-    print('Vqslod checkpoint')
-    mt1 = mt_vqslod_filtered.checkpoint(
-            f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_vqslod_filtered_checkpoint.mt",  overwrite= True)
-
-
-
-
-    print('Sample QC filtering ')
-    mt_sqc1 = mt1.annotate_cols(
-        sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt1.s])
-
-    mt_sqc1_filtered = mt_sqc1.filter_cols(
-        (mt_sqc1.sample_QC_nonHail.PASS_Depth == 1) &
-        (mt_sqc1.sample_QC_nonHail.PASS_ID == 1) &
-        (mt_sqc1.sample_QC_nonHail.PASS_Median_FreeMix == 1) &
-        (mt_sqc1.sample_QC_nonHail.PASS_NRD == 1) &
-        (mt_sqc1.sample_QC_nonHail.PASS_SampleSwap == 1) &
-        (mt_sqc1.sample_QC_nonHail.PASS_Sex == 1) &
-        (mt_sqc1.sample_QC_nonHail.PASS_DUP == 1)
+        hl.case()
+            .when((mt.Variant_Type == "SNP"), (mt.VQSLOD_SNP.VQSLOD >= thresholds['intervalwgs']['snp_vqsr_threshold']))
+            .when((mt.Variant_Type == "INDEL"),
+                  (mt.VQSLOD_INDEL.VQSLOD >= thresholds['intervalwgs']['indel_vqsr_threshold']))
+            .default(False)  # remove everything else
     )
 
+    mt_vqslod_filtered = mt.filter_rows(vqslod_filtered)
+    print("Finished filtering. Writing out matrixtable...")
+
+    mt1 = mt_vqslod_filtered.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_vqslod_filtered_checkpoint.mt",
+                                        overwrite=True)
+    print("Finished writing vqslod filtered matrixtable")
+
+    ########### Sample QC filtering
+    print("Filtering on sample qc")
+    mt_sqc1_filtered = mt1.filter_cols(
+        (mt1.sample_QC_nonHail.PASS_Depth == 1) &
+        (mt1.sample_QC_nonHail.PASS_ID == 1) &
+        (mt1.sample_QC_nonHail.PASS_Median_FreeMix == 1) &
+        (mt1.sample_QC_nonHail.PASS_NRD == 1) &
+        (mt1.sample_QC_nonHail.PASS_SampleSwap == 1) &
+        (mt1.sample_QC_nonHail.PASS_Sex == 1) &
+        (mt1.sample_QC_nonHail.PASS_DUP == 1)
+    )
+    print("Writing out filtered sample qc checkpoint")
     mt_sqc2 = hl.sample_qc(mt_sqc1_filtered, name='sample_QC_Hail')
-    print('write to to google bucket')
-    mt_sqc2 = mt_sqc2.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_filtered.mt", overwrite= True)
-    filter_sampleqc_table=mt_sqc2.cols().flatten()
-    filter_sampleqc_table.export(f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
 
-##########################################
-    #Variant QC
-    print('Variant QC and write matrixtable to to google bucket:')
+    mt_sqc2 = mt_sqc2.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_sampleQC_filtered_checkpoint.mt",
+                                 overwrite=True)
+    filter_sampleqc_table = mt_sqc2.cols().flatten()
+    filter_sampleqc_table.export(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
+
+    ##### ADD allele bias script here
+
+    ## Remove initial missing genotypes
+    mt_sqc2 = mt_sqc2.filter_entries(hl.is_defined(mt_sqc2.GT))
+
+    ab = mt_sqc2.AD[1] / hl.sum(mt_sqc2.AD)
+
+    filter_condition_ab = (
+        hl.case(missing_false=True)
+            .when(mt_sqc2.GT.is_hom_ref(), ab > 0.1)
+            .when(mt_sqc2.GT.is_het(), (ab < 0.20) | (ab > 0.80))
+            .when(mt_sqc2.GT.is_hom_var(), ab < 0.9)
+            .default(False)  # remove everything else
+    )
+
+    fraction_filtered = mt_sqc2.aggregate_entries(hl.agg.fraction(filter_condition_ab))
+    print(f'Filtering {fraction_filtered * 100:.2f}% entries out of downstream analysis.')
+
+    mt_sqc2_GT = mt_sqc2.filter_entries(filter_condition_ab, keep=False)
+
+    ## Saving on s3
+    # mt_sqc2 = mt_sqc2_GT.checkpoint('s3a://interval-wgs/checkpoints_new/chr20_sampleQC_step1_filtered_allele_balance_checkpoint.mt', _read_if_exists = True)
+
+    ## Saving on local volume
+    mt_sqc2 = mt_sqc2_GT.checkpoint(
+        f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
+        overwrite=True)
+
+    ######################
+    ##### VARIANT qc
+    ######################
+    print("Variant qc:")
     mt_sqc_vqc = hl.variant_qc(mt_sqc2, name='variant_QC_Hail')
-
     mt_sqc_vqc_filtered = mt_sqc_vqc.filter_rows(
         (mt_sqc_vqc.variant_QC_Hail.call_rate >= 0.98) &
         (mt_sqc_vqc.variant_QC_Hail.p_value_hwe >= 10 ** -6))
 
+    #####################################################################
+    ###################### FINAL QC AFTER FILTERING  ####################
+    #####################################################################
 
-    # drop those structure run additional sample qc and variant qc and have the final values
-    # sample and filter qc tab tables
     fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
 
     mt1 = mt_sqc_vqc_filtered.drop(*fields_to_drop)
 
-    mt2 = hl.sample_qc(mt1,name='sample_QC_Hail')
+    mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
 
-    mt3 = mt3.checkpoint(
-            f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-sampleqc-variantqc-filtered-FINAL.mt", overwrite= True)
-
+    mt3 = mt_sqc_vqc_filtered.checkpoint(
+        f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt", overwrite=True)
     mt3_rows = mt3.rows()
-    mt3_rows.select(mt3_rows.variant_QC_Hail).flatten().export(f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}-variantQC-sampleQC_filtered_FINAL.tsv.bgz",
-                                                               header=True)
+    mt3_rows.select(mt3_rows.variant_QC_Hail).flatten().export(
+        f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-variantQC_sampleQC_filtered_FINAL.tsv.bgz", header=True)
+

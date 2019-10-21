@@ -15,12 +15,12 @@ import json
 project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
 
-s3credentials = os.path.join(project_root, "config-files/s3_credentials.json")
+s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
 print(s3credentials)
 
-storage = os.path.join(project_root , "config-files/storage.json")
+storage = os.path.join(project_root , "config_files/storage.json")
 
-thresholds = os.path.join(project_root, "config-files/thresholds.json")
+thresholds = os.path.join(project_root, "config_files/thresholds.json")
 
 with open(f"{s3credentials}", 'r') as f:
     credentials = json.load(f)

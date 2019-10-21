@@ -150,6 +150,37 @@ if __name__ == "__main__":
     filter_sampleqc_table.export(f"{tmp_dir}/output-tables/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
 
 
+    ##### ADD allele bias script here
+
+    ## Remove initial missing genotypes
+    mt_sqc2 = mt_sqc2.filter_entries(hl.is_defined(mt_sqc2.GT))
+
+    ab = mt_sqc2.AD[1] / hl.sum(mt_sqc2.AD)
+
+    filter_condition_ab = (
+        hl.case(missing_false=True)
+            .when(mt_sqc2.GT.is_hom_ref(), ab > 0.1)
+            .when(mt_sqc2.GT.is_het(), (ab < 0.20) | (ab > 0.80))
+            .when(mt_sqc2.GT.is_hom_var(), ab < 0.9)
+            .default(False)  # remove everything else
+    )
+
+    fraction_filtered = mt_sqc2.aggregate_entries(hl.agg.fraction(filter_condition_ab))
+    print(f'Filtering {fraction_filtered * 100:.2f}% entries out of downstream analysis.')
+
+
+    mt_sqc2_GT = mt_sqc2.filter_entries(filter_condition_ab, keep=False)
+
+    ## Saving on s3
+    #mt_sqc2 = mt_sqc2_GT.checkpoint('s3a://interval-wgs/checkpoints_new/chr20_sampleQC_step1_filtered_allele_balance_checkpoint.mt', _read_if_exists = True)
+
+    ## Saving on local volume
+    mt_sqc2 = mt_sqc2_GT.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
+                                    overwrite=True)
+
+    ######################
+    ##### VARIANT qc
+    ######################
     print("Variant qc:")
     mt_sqc_vqc = hl.variant_qc(mt_sqc2, name='variant_QC_Hail')
     mt_sqc_vqc_filtered = mt_sqc_vqc.filter_rows(
