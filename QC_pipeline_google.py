@@ -44,7 +44,7 @@ if __name__ == "__main__":
     ###################### INPUT DATA  ##############################
     #####################################################################
     # Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
-    CHROMOSOME = sys.argv[1]
+    #CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
     mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
 
