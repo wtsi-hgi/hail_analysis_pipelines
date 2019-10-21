@@ -16,19 +16,15 @@ project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
 
 
-storage =  "gs://pa10/config_files/storage.json"
 
-thresholds = "gs://pa10/config_files/thresholds.json"
+snp_vqsr_threshold= -0.6647
+indel_vqsr_threshold=-1.2537
 
-with open(f"{storage}", 'r') as f:
-    storage = json.load(f)
 
-with open(f"{thresholds}", 'r') as f:
-    thresholds = json.load(f)
 
-BUCKET = storage['intervalwgs']['google']['bucket']
+BUCKET = "gs://interval-wgs"
 #Define chromosome here
-tmp_dir=storage['intervalwgs']['google']['tmp_dir']
+tmp_dir="/Users/pa10/Programming/google-code/google/tmp"
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
@@ -38,11 +34,11 @@ if __name__ == "__main__":
 
     #1. Import required files
     print("1. import required tables in hail for the project.")
-    VQSLOD_snps = hl.import_table(storage["intervalwgs"]["google"]["vqsr_snp"],
+    VQSLOD_snps = hl.import_table("gs://interval-wgs/qc-files/VQSLOD_snps.bgz",
                                   types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    VQSLOD_indels = hl.import_table(storage["intervalwgs"]["google"]["vqsr_indel"],
+    VQSLOD_indels = hl.import_table("gs://interval-wgs/qc-files/VQSLOD_indels.bgz",
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["google"]["sampleQC_non_hail"], impute=True)
+    sample_QC_nonHail = hl.import_table("gs://interval-wgs/qc-files/INTERVAL_WGS_Sample_QC_04-09-2019.txt.gz", impute=True)
 
     #####################################################################
     ###################### INPUT DATA  ##############################
@@ -103,9 +99,9 @@ if __name__ == "__main__":
     print("Filtering on VQSLOD scores")
     vqslod_filtered = (
         hl.case()
-            .when((mt.Variant_Type == "SNP"), (mt.VQSLOD_SNP.VQSLOD >= thresholds['intervalwgs']['snp_vqsr_threshold']))
+            .when((mt.Variant_Type == "SNP"), (mt.VQSLOD_SNP.VQSLOD >= snp_vqsr_threshold))
             .when((mt.Variant_Type == "INDEL"),
-                  (mt.VQSLOD_INDEL.VQSLOD >= thresholds['intervalwgs']['indel_vqsr_threshold']))
+                  (mt.VQSLOD_INDEL.VQSLOD >= indel_vqsr_threshold))
             .default(False)  # remove everything else
     )
 
