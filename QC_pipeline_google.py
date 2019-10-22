@@ -38,7 +38,7 @@ if __name__ == "__main__":
                                   types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
     VQSLOD_indels = hl.import_table("gs://interval-wgs/qc-files/VQSLOD_indels.bgz",
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    sample_QC_nonHail = hl.import_table("gs://interval-wgs/qc-files/INTERVAL_WGS_Sample_QC_04-09-2019.txt.gz", impute=True)
+    sample_QC_nonHail = hl.import_table("gs://interval-wgs/qc-files/INTERVAL_WGS_Sample_QC_04-09-2019.txt", impute=True)
 
     #####################################################################
     ###################### INPUT DATA  ##############################
