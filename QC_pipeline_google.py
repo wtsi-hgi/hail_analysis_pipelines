@@ -113,6 +113,7 @@ if __name__ == "__main__":
     print("Finished writing vqslod filtered matrixtable")
 
     ########### Sample QC filtering
+    mt1 = mt1.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt.s])
     print("Filtering on sample qc")
     mt_sqc1_filtered = mt1.filter_cols(
         (mt1.sample_QC_nonHail.PASS_Depth == 1) &
