@@ -53,7 +53,7 @@ if __name__ == "__main__":
                                   types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
     VQSLOD_indels = hl.import_table(storage["intervalwgs"]["s3"]["vqsr_indel"],
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["s3"]["sampleQC_non_hail"], impute=True)
+    sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["s3"]["sampleQC_non_hail"], impute=True, force_bgz=True)
 
 
 
