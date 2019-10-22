@@ -46,12 +46,13 @@ if __name__ == "__main__":
     # Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
     #CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
-    mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
+    #mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
 
     print("Splitting mt and writing out split mt")
-    mt_split = hl.split_multi_hts(mt, keep_star=False)
+    #mt_split = hl.split_multi_hts(mt, keep_star=False)
+    mt_split =hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt")
 
-    mt_split = mt_split.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt", overwrite=True)
+    #mt_split = mt_split.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt", overwrite=True)
     print("Finished splitting and writing mt. ")
 
     #####################################################################
@@ -108,12 +109,12 @@ if __name__ == "__main__":
     mt_vqslod_filtered = mt.filter_rows(vqslod_filtered)
     print("Finished filtering. Writing out matrixtable...")
 
-    mt1 = mt_vqslod_filtered.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_vqslod_filtered_checkpoint.mt",
-                                        overwrite=True)
+    mt1=mt_vqslod_filtered
+    #mt1 = mt_vqslod_filtered.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_vqslod_filtered_checkpoint.mt",overwrite=True)
     print("Finished writing vqslod filtered matrixtable")
 
     ########### Sample QC filtering
-    mt1 = mt1.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt.s])
+    mt1 = mt1.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt1.s])
     print("Filtering on sample qc")
     mt_sqc1_filtered = mt1.filter_cols(
         (mt1.sample_QC_nonHail.PASS_Depth == 1) &
