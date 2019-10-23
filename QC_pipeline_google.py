@@ -46,13 +46,13 @@ if __name__ == "__main__":
     # Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
     #CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
-    #mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
+    mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
 
     print("Splitting mt and writing out split mt")
-    #mt_split = hl.split_multi_hts(mt, keep_star=False)
-    mt_split =hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt")
+    mt_split = hl.split_multi_hts(mt, keep_star=False)
+    #mt_split =hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt")
 
-    #mt_split = mt_split.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt", overwrite=True)
+    mt_split = mt_split.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi.mt", overwrite=True)
     print("Finished splitting and writing mt. ")
 
     #####################################################################

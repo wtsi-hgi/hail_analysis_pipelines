@@ -133,13 +133,13 @@ if __name__ == "__main__":
     ########### Sample QC filtering
     print("Filtering on sample qc")
     mt_sqc1_filtered = mt1.filter_cols(
-                (mt1.sample_QC_nonHail.PASS_Depth == 1 ) &
-                (mt1.sample_QC_nonHail.PASS_ID == 1) &
-                (mt1.sample_QC_nonHail.PASS_Median_FreeMix == 1) &
-                (mt1.sample_QC_nonHail.PASS_NRD == 1) &
-                (mt1.sample_QC_nonHail.PASS_SampleSwap == 1) &
-                (mt1.sample_QC_nonHail.PASS_Sex == 1) &
-                (mt1.sample_QC_nonHail.PASS_DUP == 1)
+        (mt1.sample_QC_nonHail["PASS.Depth"] == 1) &
+        (mt1.sample_QC_nonHail["PASS.ID"] == 1) &
+        (mt1.sample_QC_nonHail["PASS.Median.FreeMix"] == 1) &
+        (mt1.sample_QC_nonHail["PASS.NRD"] == 1) &
+        (mt1.sample_QC_nonHail["PASS.SampleSwap"] == 1) &
+        (mt1.sample_QC_nonHail["PASS.Sex"] == 1) &
+        (mt1.sample_QC_nonHail["PASS.DUP"] == 1)
             )
     print("Writing out filtered sample qc checkpoint")
     mt_sqc2 = hl.sample_qc(mt_sqc1_filtered, name='sample_QC_Hail')
