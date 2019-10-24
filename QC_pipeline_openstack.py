@@ -110,7 +110,7 @@ if __name__ == "__main__":
     #####################################################################
     ###################### START FILTERING ##############################
     #####################################################################
-
+    mt=mt2
     ######## VQSR filtering
     print("Annotation VQSLOD snp and indel scores")
     mt = mt.annotate_rows(VQSLOD_SNP=VQSLOD_snps.key_by("Locus")[mt.locus])

@@ -91,7 +91,7 @@ if __name__ == "__main__":
     #####################################################################
     ###################### START FILTERING ##############################
     #####################################################################
-
+    mt=mt2
     ######## VQSR filtering
     print("Annotation VQSLOD snp and indel scores")
     mt = mt.annotate_rows(VQSLOD_SNP=VQSLOD_snps.key_by("Locus")[mt.locus])
@@ -114,7 +114,6 @@ if __name__ == "__main__":
     print("Finished writing vqslod filtered matrixtable")
 
     ########### Sample QC filtering
-    mt1 = mt1.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt1.s])
     print("Filtering on sample qc")
     mt_sqc1_filtered = mt1.filter_cols(
         (mt1.sample_QC_nonHail["PASS.Depth"] == 1) &
