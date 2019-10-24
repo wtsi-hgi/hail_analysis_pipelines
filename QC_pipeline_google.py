@@ -131,7 +131,7 @@ if __name__ == "__main__":
     mt_sqc2 = mt_sqc2.checkpoint(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_sampleQC_filtered_checkpoint.mt",
                                  overwrite=True)
     filter_sampleqc_table = mt_sqc2.cols().flatten()
-    filter_sampleqc_table.export(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
+    filter_sampleqc_table.export(f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
 
     ##### ADD allele bias script here
 

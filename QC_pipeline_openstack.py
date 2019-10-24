@@ -63,7 +63,7 @@ if __name__ == "__main__":
     #Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
     CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
-    mt = hl.read_matrix_table(f"{storage['intervalwgs']['s3']['newmatrixtables']}/{CHROMOSOME}.mt")
+    mt = hl.read_matrix_table(f"{storage['intervalwgs']['s3']['repartitioned']}/{CHROMOSOME}.mt")
 
     print("Splitting mt and writing out split mt")
     mt_split = hl.split_multi_hts(mt, keep_star=False)
