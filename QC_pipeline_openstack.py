@@ -55,6 +55,7 @@ if __name__ == "__main__":
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
     sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["s3"]["sampleQC_non_hail"], impute=True)
 
+    centromere_table = hl.import_bed(storage["intervalwgs"]["s3"]["centromere"], reference_genome='GRCh38', min_partitions = 250)
 
 
     #####################################################################
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/{CHROMOSOME}.mt")
 
     print("Splitting mt and writing out split mt")
-    mt_split = hl.split_multi_hts(mt, keep_star=False)
+    mt_split = hl.split_multi_hts(mt, keep_star=False, left_aligned = False)
 
 
     mt_split = mt_split.checkpoint(f"{tmp_dir}/matrixtable/{CHROMOSOME}-split-multi.mt",  overwrite=True)
@@ -92,7 +93,7 @@ if __name__ == "__main__":
 
     # Unfiltered data summary stats:
     print("Finished annotating rows, annotating columns now")
-    mt_sqc1_unfiltered = mt.annotate_cols(sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt.s])
+    mt_sqc1_unfiltered = mt.annotate_cols(sample_QC_nonHail_unfiltered=sample_QC_nonHail.key_by("ID")[mt.s])
     mt_sqc2_unfiltered = hl.sample_qc(mt_sqc1_unfiltered, name='sample_QC_Hail')
 
     panda_df_unfiltered_table = mt_sqc2_unfiltered.cols().flatten()
@@ -132,6 +133,14 @@ if __name__ == "__main__":
     mt1 = mt_vqslod_filtered.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_vqslod_filtered_checkpoint.mt", overwrite=True)
     print("Finished writing vqslod filtered matrixtable")
 
+    ######### CENTROMERE FILTERING
+    print("Centromere filtering")
+    mt_vqslod_filtered_WO_centromere = mt_vqslod_filtered.filter_rows(
+        hl.is_defined(centromere_table[mt_vqslod_filtered.locus]), keep=False)
+
+    mt_sqc1 = mt_vqslod_filtered_WO_centromere.annotate_cols(
+        sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt_vqslod_filtered_WO_centromere.s])
+
     ########### Sample QC filtering
     print("Filtering on sample qc")
     mt_sqc1_filtered = mt1.filter_cols(
@@ -148,11 +157,18 @@ if __name__ == "__main__":
 
     mt_sqc2 = mt_sqc2.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_filtered_checkpoint.mt",
                                           overwrite=True)
+
     filter_sampleqc_table = mt_sqc2.cols().flatten()
     filter_sampleqc_table.export(f"{tmp_dir}/output-tables/{CHROMOSOME}-sampleQC_filtered.tsv.bgz", header=True)
 
 
     ##### ADD allele bias script here
+
+    initial_geno = mt_sqc2.aggregate_entries(hl.agg.fraction(hl.is_defined(mt_sqc2.GT)))
+
+    print(f'Defined genotypes: {initial_geno * 100:.2f}%.')
+    initial_missing = 100 - (initial_geno * 100)
+    print(f'Initial missing genotype: {initial_missing:.2f}%.')
 
     ## Remove initial missing genotypes
     mt_sqc2 = mt_sqc2.filter_entries(hl.is_defined(mt_sqc2.GT))
@@ -170,26 +186,43 @@ if __name__ == "__main__":
     fraction_filtered = mt_sqc2.aggregate_entries(hl.agg.fraction(filter_condition_ab))
     print(f'Filtering {fraction_filtered * 100:.2f}% entries out of downstream analysis.')
 
+    print(
+        f'Total Filtering {(fraction_filtered * 100) + initial_missing:.2f}% entries including initial missing data out of downstream analysis.')
 
     mt_sqc2_GT = mt_sqc2.filter_entries(filter_condition_ab, keep=False)
+
+    Total_geno = mt_sqc2.aggregate_entries(hl.agg.count_where(hl.is_defined(mt_sqc2.GT)))
+    print('Total genotypes: ' + str(Total_geno))
+    ############################
+
+    pro_AD_DP = hl.sum(mt_sqc2.AD) / mt_sqc2.DP
+
+    Other_filters = (
+        hl.case(missing_false=True)
+            .when(hl.is_defined(mt_sqc2.GT), (mt_sqc2.DP > 100) | (pro_AD_DP < 0.9))
+            .default(False)  # remove everything else
+    )
+
+    mt_sqc3 = mt_sqc2.filter_entries(Other_filters, keep=False)
 
     ## Saving on s3
     #mt_sqc2 = mt_sqc2_GT.checkpoint('s3a://interval-wgs/checkpoints_new/chr20_sampleQC_step1_filtered_allele_balance_checkpoint.mt', _read_if_exists = True)
 
     ## Saving on local volume
-    mt_sqc2 = mt_sqc2_GT.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
+    mt_sqc3= mt_sqc3.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
                                     overwrite=True)
 
     ######################
     ##### VARIANT qc
     ######################
     print("Variant qc:")
-    mt_sqc_vqc = hl.variant_qc(mt_sqc2, name='variant_QC_Hail')
+    mt_sqc_vqc = hl.variant_qc(mt_sqc3, name='variant_QC_Hail')
     mt_sqc_vqc_filtered = mt_sqc_vqc.filter_rows(
-                (mt_sqc_vqc.variant_QC_Hail.call_rate >= 0.98) &
-                (mt_sqc_vqc.variant_QC_Hail.p_value_hwe >= 10 ** -6))
-
-
+        (mt_sqc_vqc.variant_QC_Hail.call_rate >= 0.95) &
+        (mt_sqc_vqc.variant_QC_Hail.p_value_hwe >= 10 ** -6) &
+        (mt_sqc_vqc.variant_QC_Hail.gq_stats.mean >= 20) &
+        (mt_sqc_vqc.variant_QC_Hail.AC[1] >= 1)
+    )
 
     #####################################################################
     ###################### FINAL QC AFTER FILTERING  ####################
