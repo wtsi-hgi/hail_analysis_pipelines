@@ -72,7 +72,7 @@ if __name__ == "__main__":
     mt_split = hl.split_multi_hts(mt, keep_star=False, left_aligned = False)
 
 
-    mt_split = mt_split.checkpoint(f"{tmp_dir}/matrixtables/{CHROMOSOME}-split-multi.mt",  overwrite=True)
+    mt_split = mt_split.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}-split-multi.mt",  overwrite=True)
     print("Finished splitting and writing mt. ")
 
 
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     mt_vqslod_filtered = mt.filter_rows(vqslod_filtered)
     print("Finished filtering. Writing out matrixtable...")
 
-    mt_vqslod_filtered = mt_vqslod_filtered.checkpoint(f"{tmp_dir}/matrixtables/{CHROMOSOME}_vqslod_filtered_checkpoint.mt", overwrite=True)
+    mt_vqslod_filtered = mt_vqslod_filtered.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_vqslod_filtered_checkpoint.mt", overwrite=True)
     print("Finished writing vqslod filtered matrixtable")
 
     ######### CENTROMERE FILTERING
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     print("Writing out filtered sample qc checkpoint")
     mt_sqc2 = hl.sample_qc(mt_sqc1_filtered, name='sample_QC_Hail')
 
-    mt_sqc2 = mt_sqc2.checkpoint(f"{tmp_dir}/matrixtables/{CHROMOSOME}_sampleQC_filtered_checkpoint.mt",
+    mt_sqc2 = mt_sqc2.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_filtered_checkpoint.mt",
                                           overwrite=True)
 
     filter_sampleqc_table = mt_sqc2.cols().flatten()
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     #mt_sqc2 = mt_sqc2_GT.checkpoint('s3a://interval-wgs/checkpoints_new/chr20_sampleQC_step1_filtered_allele_balance_checkpoint.mt', _read_if_exists = True)
 
     ## Saving on local volume
-    mt_sqc3= mt_sqc3.checkpoint(f"{tmp_dir}/matrixtables/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
+    mt_sqc3= mt_sqc3.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
                                     overwrite=True)
 
     ######################
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
 
     mt3 = mt3.checkpoint(
-        f"{tmp_dir}/matrixtables/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt", overwrite=True)
+        f"{tmp_dir}/checkpoints/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt", overwrite=True)
     mt3_rows = mt3.rows()
     mt3_rows.select(mt3_rows.variant_QC_Hail).flatten().export(
         f"{tmp_dir}/output-tables/{CHROMOSOME}-variantQC_sampleQC_filtered_FINAL.tsv.bgz", header=True)
