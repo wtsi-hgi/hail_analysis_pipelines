@@ -96,9 +96,9 @@ if __name__ == "__main__":
 
 
     mt_final = mtX_union_males.union_cols(mtX_dip_females_dropf)
-
+    print("Output matrixtable:")
     mt_final = mt_final.checkpoint(
         f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX_surgery.mt", overwrite=True)
-
+    print("Export VCF")
     hl.export_vcf(mt_final, f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX-surgery.vcf.bgz")
 
