@@ -189,27 +189,29 @@ if __name__ == "__main__":
     print(
         f'Total Filtering {(fraction_filtered * 100) + initial_missing:.2f}% entries including initial missing data out of downstream analysis.')
 
-    mt_sqc2_GT = mt_sqc2.filter_entries(filter_condition_ab, keep=False)
-
     Total_geno = mt_sqc2.aggregate_entries(hl.agg.count_where(hl.is_defined(mt_sqc2.GT)))
     print('Total genotypes: ' + str(Total_geno))
+
+    mt_sqc2_GT = mt_sqc2.filter_entries(filter_condition_ab, keep=False)
+
+
     ############################
 
-    pro_AD_DP = hl.sum(mt_sqc2.AD) / mt_sqc2.DP
+    pro_AD_DP = hl.sum(mt_sqc2_GT.AD) / mt_sqc2_GT.DP
 
     Other_filters = (
         hl.case(missing_false=True)
-            .when(hl.is_defined(mt_sqc2.GT), (mt_sqc2.DP > 100) | (pro_AD_DP < 0.9))
+            .when(hl.is_defined(mt_sqc2_GT.GT), (mt_sqc2_GT.DP > 100) | (pro_AD_DP < 0.9))
             .default(False)  # remove everything else
     )
 
-    mt_sqc3 = mt_sqc2.filter_entries(Other_filters, keep=False)
+    mt_sqc3 = mt_sqc2_GT.filter_entries(Other_filters, keep=False)
 
     ## Saving on s3
     #mt_sqc2 = mt_sqc2_GT.checkpoint('s3a://interval-wgs/checkpoints_new/chr20_sampleQC_step1_filtered_allele_balance_checkpoint.mt', _read_if_exists = True)
 
     ## Saving on local volume
-    mt_sqc3= mt_sqc3.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_allele_balance_checkpoint.mt",
+    mt_sqc3= mt_sqc3.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}_sampleQC_step1_filtered_GenotypeQC_checkpoint.mt",
                                     overwrite=True)
 
     ######################
