@@ -87,8 +87,11 @@ if __name__ == "__main__":
     #For diploid male samples chrX variants KEEP PAR regions only
     mtX_dip_males_PAR = hl.filter_intervals(mtX_dip_males, par, keep = True)
 
+    fields_to_drop = ['GT.PGT', 'GT.PID', 'GT.PS']
 
-    mtX_union_males = mtX_hap_males_NONPAR.union_rows(mtX_dip_males_PAR)
+    mtX_dip_males_PAR_dropf = mtX_dip_males_PAR.drop(*fields_to_drop)
+
+    mtX_union_males = mtX_hap_males_NONPAR.union_rows(mtX_dip_males_PAR_dropf)
 
     mt_final = mtX_union_males.union_cols(mtX_dip_females)
 
