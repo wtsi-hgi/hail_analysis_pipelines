@@ -50,10 +50,10 @@ if __name__ == "__main__":
     ###################### chromosome X  ##############################
     #####################################################################
     #DEFINE INPUT FILE PATHS
-    chrX_haploid_vcf_path="s3a://elgh-ddd/chrX-haploid.vcf.bgz"
-    chrX_diploid_vcf_path="s3a://elgh-ddd/chrX-diploid.vcf.bgz"
-    chrY_haploid_vcf_path="s3a://elgh-ddd/chrY-haploid.vcf.bgz"
-    chrY_diploid_vcf_path="s3a://elgh-ddd/chrY-diploid.vcf.bgz"
+    chrX_haploid_vcf_path= storage["elghddd"]["s3"]["chrXhap"]
+    chrX_diploid_vcf_path= storage["elghddd"]["s3"]["chrXdip"]
+    chrY_haploid_vcf_path= storage["elghddd"]["s3"]["chrYhap"]
+    chrY_diploid_vcf_path= storage["elghddd"]["s3"]["chrYdip"]
     print("Read in all VCFs:")
     mtX_hap = hl.import_vcf(chrX_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     mtX_dip = hl.import_vcf(chrX_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
@@ -62,20 +62,20 @@ if __name__ == "__main__":
     ############################
     CHROMOSOME = "chrX"
     print(f"Reading {CHROMOSOME} diploid VCF calls")
-    mtX_split = hl.split_multi_hts(mtX_dip, keep_star = False)
-
+    mtX_dip_split = hl.split_multi_hts(mtX_dip, keep_star = False)
+    mtX_hap_split = hl.split_multi_hts(mtX_hap, keep_star = False)
     ####### sex imputation
     print("Sex imputation:")
-    mtx_unphased = mtX_split.select_entries(GT=hl.unphased_diploid_gt_index_call(mtX_split.GT.n_alt_alleles()))
+    mtx_unphased = mtX_dip_split.select_entries(GT=hl.unphased_diploid_gt_index_call(mtX_dip_split.GT.n_alt_alleles()))
     imputed_sex = hl.impute_sex(mtx_unphased.GT)
 
     #Haploid VCF: filter to male samples only
     print("Haploid chrX VCF: filter to male samples only")
-    mtX_hap_males = mtX_hap.filter_cols(imputed_sex[mtX_hap.s].is_female, keep=False)
+    mtX_hap_males = mtX_hap_split.filter_cols(imputed_sex[mtX_hap_split.s].is_female, keep=False)
     #Diploid vcf: one matrixtable only Female, one matrixtable only male
     print("Diploid chrX vcf: create new matrixtable one for males one for female samples")
-    mtX_dip_males = mtX_dip.filter_cols(imputed_sex[mtX_dip.s].is_female, keep = False)
-    mtX_dip_females = mtX_dip.filter_cols(imputed_sex[mtX_dip.s].is_female, keep = True)
+    mtX_dip_males = mtX_dip_split.filter_cols(imputed_sex[mtX_dip_split.s].is_female, keep = False)
+    mtX_dip_females = mtX_dip_split.filter_cols(imputed_sex[mtX_dip_split.s].is_female, keep = True)
 
     #Get par region
     rg = hl.get_reference('GRCh38')
