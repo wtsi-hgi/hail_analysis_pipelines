@@ -50,10 +50,10 @@ if __name__ == "__main__":
     ###################### chromosome X  ##############################
     #####################################################################
     #DEFINE INPUT FILE PATHS
-    chrX_haploid_vcf_path="s3://elgh-ddd/chrX-haploid.vcf.bgz"
-    chrX_diploid_vcf_path="s3://elgh-ddd/chrX-diploid.vcf.bgz"
-    chrY_haploid_vcf_path="s3://elgh-ddd/chrY-haploid.vcf.bgz"
-    chrY_diploid_vcf_path="s3://elgh-ddd/chrY-diploid.vcf.bgz"
+    chrX_haploid_vcf_path="s3a://elgh-ddd/chrX-haploid.vcf.bgz"
+    chrX_diploid_vcf_path="s3a://elgh-ddd/chrX-diploid.vcf.bgz"
+    chrY_haploid_vcf_path="s3a://elgh-ddd/chrY-haploid.vcf.bgz"
+    chrY_diploid_vcf_path="s3a://elgh-ddd/chrY-diploid.vcf.bgz"
     print("Read in all VCFs:")
     mtX_hap = hl.import_vcf(chrX_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     mtX_dip = hl.import_vcf(chrX_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
