@@ -241,9 +241,13 @@ if __name__ == "__main__":
 
     mt3 = mt3.checkpoint(
         f"{tmp_dir}/checkpoints/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt", overwrite=True)
+    mt3_cols= mt3.cols()
+    mt3_cols.flatten().export(
+        f"{tmp_dir}/output-tables/{CHROMOSOME}-sampleQC_filtered_FINAL.tsv.bgz", header=True)
+
     mt3_rows = mt3.rows()
     mt3_rows.select(mt3_rows.variant_QC_Hail).flatten().export(
-        f"{tmp_dir}/output-tables/{CHROMOSOME}-variantQC_sampleQC_filtered_FINAL.tsv.bgz", header=True)
+        f"{tmp_dir}/output-tables/{CHROMOSOME}-variantQC_filtered_FINAL.tsv.bgz", header=True)
 
 
 
