@@ -72,7 +72,7 @@ if __name__ == "__main__":
     mt_split = hl.split_multi_hts(mt, keep_star=False, left_aligned = False)
 
 
-    mt_split = mt_split.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}-split-multi.mt",  overwrite=True)
+    mt_split = mt_split.checkpoint(f"{tmp_dir}/checkpoints/{CHROMOSOME}-split-multi_checkpoint.mt",  overwrite=True)
     print("Finished splitting and writing mt. ")
 
 
