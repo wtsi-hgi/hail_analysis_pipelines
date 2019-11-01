@@ -10,19 +10,14 @@ project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
 
 
-storage = os.path.join(project_root , "config_files/storage.json")
+snp_vqsr_threshold= -0.6647
+indel_vqsr_threshold=-1.2537
 
-thresholds = os.path.join(project_root, "config_files/thresholds.json")
 
-with open(f"{storage}", 'r') as f:
-    storage = json.load(f)
 
-with open(f"{thresholds}", 'r') as f:
-    thresholds = json.load(f)
-
-BUCKET = storage['intervalwgs']['google']['bucket']
-
-tmp_dir=storage['intervalwgs']['google']['tmp_dir']
+BUCKET = "gs://interval-wgs"
+#Define chromosome here
+tmp_dir="/Users/pa10/Programming/google-code/google/tmp"
 
 
 CHROMOSOMES = ["chr2",
@@ -49,7 +44,7 @@ CHROMOSOMES = ["chr2",
                "chrX",
                "chrY"
                ]
-tmp_dir=storage['intervalwgs']['google']['tmp_dir']
+
 
 
 covariates =[
@@ -118,10 +113,10 @@ if __name__ == "__main__":
     fbc = full_blood_count.key_by('Wgs_RAW_bl')
     ja = ja.annotate(fbc=full_blood_count[ja.gws_gwa_map.Wgs_RAW_bl])
 
-    mt_chr1 = hl.read_matrix_table(f"{BUCKET}/matrixtables/chr1/chr1-sampleqc-variantqc-filtered-FINAL.mt")
+    mt_chr1 = hl.read_matrix_table(f"{BUCKET}/matrixtables/chr1/chr1-full-sampleqc-variantqc-filtered-FINAL.mt")
 
     for CHROMOSOME in CHROMOSOMES:
-        mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-sampleqc-variantqc-filtered-FINAL.mt")
+        mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
         mt_chr1 = mt_chr1.union_rows(mt)
 
     CHROMOSOME = "WGS"
