@@ -1,59 +1,29 @@
-
-'''
-author: Pavlos Antoniou
-date: 22/07/19
-'''
-
 import os
 import hail as hl
-import pyspark
-import json
 import sys
-
+import json
 
 
 
 project_root = os.path.dirname(os.path.dirname(__file__))
 print(project_root)
 
-s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
-print(s3credentials)
 
-storage = os.path.join(project_root , "config_files/storage.json")
-
-thresholds = os.path.join(project_root, "config_files/thresholds.json")
-
-with open(f"{s3credentials}", 'r') as f:
-    credentials = json.load(f)
-
-with open(f"{storage}", 'r') as f:
-    storage = json.load(f)
-
-with open(f"{thresholds}", 'r') as f:
-    thresholds = json.load(f)
-
+BUCKET = "gs://elgh-ddd"
+#Define chromosome here
+tmp_dir="/Users/pa10/Programming/google-code/google/tmp"
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
-    sc = pyspark.SparkContext()
     #Define the hail persistent storage directory
-    tmp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
-    #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
-    # you may use your own here from your .s3fg file in your home directory
-    hadoop_config = sc._jsc.hadoopConfiguration()
+    hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
 
-    hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
-    hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
 
-    #####################################################################
-    ###################### chromosome X  ##############################
-    #####################################################################
-    #DEFINE INPUT FILE PATHS
-    chrX_haploid_vcf_path= storage["elghddd"]["s3"]["chrXhap"]
-    chrX_diploid_vcf_path= storage["elghddd"]["s3"]["chrXdip"]
-    chrY_haploid_vcf_path= storage["elghddd"]["s3"]["chrYhap"]
-    chrY_diploid_vcf_path= storage["elghddd"]["s3"]["chrYdip"]
+    chrX_haploid_vcf_path= "f{BUCKET}/chrX-haploid.vcf.bgz"
+    chrX_diploid_vcf_path= "f{BUCKET}/chrX-diploid.vcf.bgz"
+    chrY_haploid_vcf_path= "f{BUCKET}/chrY-haploid.vcf.bgz"
+    chrY_diploid_vcf_path= "f{BUCKET}/chrY-diploid.vcf.bgz"
+
     print("Read in all VCFs:")
     mtX_hap = hl.import_vcf(chrX_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     mtX_dip = hl.import_vcf(chrX_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
@@ -107,7 +77,6 @@ if __name__ == "__main__":
     mt_final = mtX_union_males.union_cols(mtX_dip_females_dropf)
     print("Output matrixtable:")
     mt_final = mt_final.checkpoint(
-        f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX_surgery.mt", overwrite=True)
+        f"{BUCKET}/elgh-ddd-chrX_surgery.mt", overwrite=True)
     print("Export VCF")
-    hl.export_vcf(mt_final, f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX-surgery.vcf.bgz")
-
+    hl.export_vcf(mt_final, f"{BUCKET}/elgh-ddd-chrX-surgery.vcf.bgz")
