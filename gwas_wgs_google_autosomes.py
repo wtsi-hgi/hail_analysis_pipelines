@@ -100,8 +100,7 @@ if __name__ == "__main__":
                                   types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
     VQSLOD_indels = hl.import_table(f"{BUCKET}/qc-files/VQSLOD_indels.bgz",
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    sample_QC_nonHail = hl.import_table(f"{BUCKET}/qc-files/INTERVAL_WGS_Sample_QC_28-05-2019_fixed_header.txt",
-                                        impute=True)
+    sample_QC_nonHail = hl.import_table("gs://interval-wgs/qc-files/INTERVAL_WGS_Sample_QC_04-09-2019.txt", impute=True)
     gws_gwa_map = hl.import_table(f"{BUCKET}/qc-files/WGS-2-GWA_omicsMap.txt", impute=True)
 
     full_blood_count = hl.import_table(f"{BUCKET}/qc-files/Int50kSampleId.tsv", impute=True, key='Wgs_RAW_bl')
