@@ -49,6 +49,7 @@ if __name__ == "__main__":
     print(f"Reading {CHROMOSOME} mt")
     mt = hl.read_matrix_table(f"{BUCKET}/{CHROMOSOME}.mt")
 
+    mt = mt.key_rows_by('locus').distinct_by_row().key_rows_by('locus', 'alleles')
 
     print("Splitting mt and writing out split mt")
     mt_split = hl.split_multi(mt, keep_star=False, left_aligned=False)
