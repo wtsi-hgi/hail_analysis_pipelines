@@ -49,8 +49,11 @@ if __name__ == "__main__":
     print("1. import required tables in hail for the project.")
 
     exclude_samples_table = hl.import_table(storage["intervalwes"]["s3"]["exclude_samples"], no_header=True, key='f0')
-    input_vcf=storage["intervalwes"]["s3"]["vcf-shard"]
-
+    input_vcf=storage["intervalwes"]["s3"]["exome"]
+    VQSLOD_snps = hl.import_table(storage["intervalwes"]["s3"]["vqsr_snp"],
+                                  types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
+    VQSLOD_indels = hl.import_table(storage["intervalwes"]["s3"]["vqsr_indel"],
+                                    types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
     #1. Import VCF
     print("1. Import VCF")
     mt = hl.import_vcf(input_vcf,force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
@@ -100,13 +103,37 @@ if __name__ == "__main__":
     )
 
 
-    # TODO:VQSR
+    #VQSR
+
+    mt=mt_filtered_variants_common
+    ######## VQSR filtering
+
+    print("Annotation VQSLOD snp and indel scores")
+    mt = mt.annotate_rows(VQSLOD_SNP=VQSLOD_snps.key_by("Locus")[mt.locus])
+    mt = mt.annotate_rows(VQSLOD_INDEL=VQSLOD_indels.key_by("Locus")[mt.locus])
+
+    print("Filtering on VQSLOD scores")
+    vqslod_filtered = (
+        hl.case()
+            .when((mt.Variant_Type == "SNP"), (mt.VQSLOD_SNP.VQSLOD >= thresholds['intervalwes']["snps"]['snp_vqsr_threshold']))
+            .when((mt.Variant_Type == "INDEL"),
+                  (mt.VQSLOD_INDEL.VQSLOD >= thresholds['intervalwes']["indels"]['indel_vqsr_threshold']))
+            .default(False)  # remove everything else
+    )
+
+    mt_vqslod_filtered = mt.filter_rows(vqslod_filtered)
+    print("Finished vqslod filtering. Writing out matrixtable...")
+
+    mt_vqslod_filtered = mt_vqslod_filtered.checkpoint(
+        f"{tmp_dir}/intervalwes/WES_vqslod_filtered_checkpoint.mt", overwrite=True)
+    print("Finished writing vqslod filtered matrixtable")
+
 
 
     #7.Rare variants filtering
     print("Rare variants filtering")
 
-    mt = mt_filtered_variants_common
+    mt = mt_vqslod_filtered
 
 
     mt_entries_filtered = mt.filter_entries(
@@ -118,6 +145,21 @@ if __name__ == "__main__":
         )
     )
 
+    ###############Allelic Balance
+
+    mt_sqc_vqc = mt_entries_filtered.filter_entries(hl.is_defined(mt_entries_filtered.GT))
+
+    ab = mt_sqc_vqc.AD[1] / hl.sum(mt_sqc_vqc.AD)
+
+    filter_condition_ab = (
+        hl.case(missing_false=True)
+            #     .when(((mt_sqc_vqc.GT.is_hom_ref()) & (mt_sqc_vqc.working_freq == "Rare")), ab > 0.1)
+            .when(((mt_sqc_vqc.GT.is_het()) & (mt_sqc_vqc.maf != "< 1%")), (ab < 0.15) | (ab > 0.80))
+            #     .when(((mt_sqc_vqc.GT.is_hom_var()) & (mt_sqc_vqc.working_freq == "Rare")), ab < 0.9)
+            .default(False)  # remove everything else
+    )
+
+    mt_sqc_vqc_GT = mt_sqc_vqc.filter_entries(filter_condition_ab, keep=False)
 
     #Now need to filter rows again by doing a new variant_qc.
     #Drop the previous variant_qc and sample_qc
@@ -125,7 +167,7 @@ if __name__ == "__main__":
 
     fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
 
-    mt1 = mt_entries_filtered.drop(*fields_to_drop)
+    mt1 = mt_sqc_vqc_GT.drop(*fields_to_drop)
 
     mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
@@ -139,11 +181,11 @@ if __name__ == "__main__":
     print("Export VCF only variants -no genotypes")
     mt1 = mt.select_entries()
     mt2 = mt1.filter_cols(mt1['s'] == 'samplenone')
-    hl.export_vcf(mt2, f"{tmp_dir}/intervalwes/VCFs/shard1.vcf.bgz")
+    hl.export_vcf(mt2, f"{tmp_dir}/intervalwes/VCFs/exome.vcf.bgz")
 
     #9. Write matrixtable
     print("Write matrixtable")
-    mt = mt.checkpoint(f"{tmp_dir}/intervalwes/shard1_filtered.mt",  overwrite=True)
+    mt = mt.checkpoint(f"{tmp_dir}/intervalwes/exome_filtered.mt",  overwrite=True)
     print("Finished writing mt. ")
 
 
