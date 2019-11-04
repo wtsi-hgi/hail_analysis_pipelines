@@ -54,10 +54,10 @@ if __name__ == "__main__":
                                   types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
     VQSLOD_indels = hl.import_table(storage["intervalwes"]["s3"]["vqsr_indel"],
                                     types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    #1. Import VCF
-    print("1. Import VCF")
-    mt = hl.import_vcf(input_vcf,force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
-
+    #1. Import VCF/ MT
+    #print("1. Import VCF")
+    #mt = hl.import_vcf(input_vcf,force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
+    mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/WES.mt")
     #2. Remove samples that have not passed initial QC:
     print("2. Remove samples that have not passed initial QC:")
     mt_result = mt.filter_cols(hl.is_defined(exclude_samples_table[mt.s]), keep=False)
