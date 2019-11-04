@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
 
     for CHROMOSOME in CHROMOSOMES:
-        mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
+        mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
         mt_chr1 = mt_chr1.union_rows(mt)
 
     CHROMOSOME = "WGS-autosomes"
