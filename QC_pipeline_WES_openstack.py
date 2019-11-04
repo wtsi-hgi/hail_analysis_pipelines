@@ -140,8 +140,8 @@ if __name__ == "__main__":
         (mt.maf != "< 1%") |
         (
                 (mt.Variant_Type == "Other") |
-                ((mt.Variant_Type == "SNP") & (mt.GQ >= thresholds["interevalwes"]["snps"]["GQ"]) & (mt.DP >= thresholds["intervalwes"]["snps"]["DP"])) |
-                ((mt.Variant_Type == "INDEL") & (mt.GQ >= thresholds["interevalwes"]["indels"]["GQ"]) & (mt.DP >= thresholds["intervalwes"]["snps"]["DP"] ))
+                ((mt.Variant_Type == "SNP") & (mt.GQ >= thresholds["intervalwes"]["snps"]["GQ"]) & (mt.DP >= thresholds["intervalwes"]["snps"]["DP"])) |
+                ((mt.Variant_Type == "INDEL") & (mt.GQ >= thresholds["intervalwes"]["indels"]["GQ"]) & (mt.DP >= thresholds["intervalwes"]["snps"]["DP"] ))
         )
     )
 
