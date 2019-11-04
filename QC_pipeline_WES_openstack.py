@@ -57,7 +57,7 @@ if __name__ == "__main__":
     #1. Import VCF/ MT
     #print("1. Import VCF")
     #mt = hl.import_vcf(input_vcf,force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
-    '''
+    
   
     mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/WES.mt")
     #2. Remove samples that have not passed initial QC:
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     mt_vqslod_filtered = mt_vqslod_filtered.checkpoint(
         f"{tmp_dir}/intervalwes/WES_vqslod_filtered_checkpoint.mt", overwrite=True)
     print("Finished writing vqslod filtered matrixtable")
-    '''
+
 
     mt_vqslod_filtered = hl.read_matrix_table(f"{tmp_dir}/intervalwes/WES_vqslod_filtered_checkpoint.mt")
 
