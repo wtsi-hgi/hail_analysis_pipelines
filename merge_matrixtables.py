@@ -109,12 +109,9 @@ if __name__ == "__main__":
 
 
     #####################################################################
-    ###################### FINAL QC AFTER FILTERING  ####################
+    ###################### QC ####################
     #####################################################################
 
-    fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
-
-    mt1 = mt.drop(*fields_to_drop)
 
     mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
