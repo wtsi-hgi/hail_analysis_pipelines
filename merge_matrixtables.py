@@ -113,7 +113,7 @@ if __name__ == "__main__":
     #####################################################################
 
 
-    mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
+    mt2 = hl.sample_qc(mt_chr1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
 
     mt3 = mt3.checkpoint(
