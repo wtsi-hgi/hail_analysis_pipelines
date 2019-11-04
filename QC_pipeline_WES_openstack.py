@@ -57,7 +57,7 @@ if __name__ == "__main__":
     #1. Import VCF/ MT
     #print("1. Import VCF")
     #mt = hl.import_vcf(input_vcf,force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
-    
+
   
     mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/WES.mt")
     #2. Remove samples that have not passed initial QC:
@@ -65,8 +65,10 @@ if __name__ == "__main__":
     mt_result = mt.filter_cols(hl.is_defined(exclude_samples_table[mt.s]), keep=False)
 
     #3. Split multi
-    print("3. Split multi")
+    print("3. Split multi and checkpoint ")
     mt_split = hl.split_multi_hts(mt_result, keep_star=False)
+    mt_split = mt_split.checkpoint(
+        f"{tmp_dir}/intervalwes/WES_vqslod_split-multi_checkpoint.mt", overwrite=True)
 
     # 4. annotate SNPs,indels
     print('Annotating rows with snp and indel info')
@@ -108,6 +110,7 @@ if __name__ == "__main__":
     #VQSR
 
     mt=mt_filtered_variants_common
+    mt= mt.checkpoint(f"{tmp_dir}/intervalwes/WES_vqslod_common_variants_filtered.mt", overwrite=True)
     ######## VQSR filtering
 
     print("Annotation VQSLOD snp and indel scores")
@@ -188,7 +191,7 @@ if __name__ == "__main__":
 
     #9. Write matrixtable
     print("Write matrixtable")
-    mt = mt.checkpoint(f"{tmp_dir}/intervalwes/exome_filtered.mt",  overwrite=True)
+    mt = mt.checkpoint(f"{tmp_dir}/intervalwes/exome_filtered_FINAL.mt",  overwrite=True)
     print("Finished writing mt. ")
 
 
