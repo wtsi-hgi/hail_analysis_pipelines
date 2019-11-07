@@ -39,8 +39,9 @@ def fix_genotpe(mt):
     pl_expr = (hl.zip_with_index(mt.PL).flatmap(lambda x: hl.range(x[0] + 1).map(lambda i: hl.cond(i == x[0], x[1], 999))))
     gt_allele = mt.GT.n_alt_alleles()
     gt_and_pl = (
-        hl.switch(
-            mt.GT.ploidy).when(1, (hl.call(gt_allele, gt_allele), pl_expr).default(mt.GT, mt.PL)))
+        hl.switch(mt.GT.ploidy)
+            .when(1, (hl.call(gt_allele, gt_allele), pl_expr) )
+                  .default(mt.GT, mt.PL))
     mt = mt.annotate_entries(GT = gt_and_pl[0], PL = gt_and_pl[1])
 
     return mt
