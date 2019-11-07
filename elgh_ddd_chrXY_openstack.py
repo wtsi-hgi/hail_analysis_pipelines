@@ -33,6 +33,19 @@ with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
 
+
+def fix_genotpe(mt:hl.Matrixtable)-> hl.MatrixTable:
+    pl_expr = (hl.zip_with_index(mt.PL)
+               .flatmap(lambda x: hl.range(x[0] + 1)
+                        .map(lambda i: hl.cond(i == x[0], x[1], 999)))
+    gt_allele = mt.GT.n_alt_alleles()
+    gt_and_pl = (hl.switch(mt.GT.ploidy)
+                 .when(1, (hl.call(gt_allele, gt_allele), pl_expr)
+                       .default((mt.GT, mt.PL)))
+    mt = mt.annotate_entries(GT = gt_and_pl[0], PL = gt_and_pl[1])
+
+    return mt
+
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -60,10 +73,20 @@ if __name__ == "__main__":
     mtY_hap = hl.import_vcf(chrY_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
+    #Haploid VCF fixing of GT
+    print("Fix GT haploid")
+    mtX_hap=fix_genotpe(mtX_hap)
+    mtY_hap=fix_genotpe(mtY_hap)
+    mtX_hap = mtX_hap.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_haploid_GT_fixed.mt", overwrite=True)
+    mtY_hap = mtY_hap.checkpoint(f"{tmp_dir}/elgh-ddd/chrY_haploid_GT_fixed.mt", overwrite=True)
+
     CHROMOSOME = "chrX"
-    print(f"Reading {CHROMOSOME} diploid VCF calls")
+    print(f"Split multi_hts {CHROMOSOME} diploid VCF calls")
     mtX_dip_split = hl.split_multi_hts(mtX_dip, keep_star = False)
     mtX_hap_split = hl.split_multi_hts(mtX_hap, keep_star = False)
+    mtX_dip_split = mtX_dip_split.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_diploid_split.mt", overwrite=True)
+    mtX_hap_split = mtX_hap_split.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_haploid_split.mt", overwrite=True)
+
 
 
     ####### sex imputation
@@ -81,10 +104,15 @@ if __name__ == "__main__":
     #Haploid VCF: filter to male samples only
     print("Haploid chrX VCF: filter to male samples only")
     mtX_hap_males = mtX_hap_split.filter_cols(imputed_sex[mtX_hap_split.s].is_female, keep=False)
+    mtX_hap_males = mtX_hap_males.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_haploid_males.mt", overwrite=True)
+
     #Diploid vcf: one matrixtable only Female, one matrixtable only male
     print("Diploid chrX vcf: create new matrixtable one for males one for female samples")
     mtX_dip_males = mtX_dip_split.filter_cols(imputed_sex[mtX_dip_split.s].is_female, keep = False)
     mtX_dip_females = mtX_dip_split.filter_cols(imputed_sex[mtX_dip_split.s].is_female, keep = True)
+    mtX_dip_males = mtX_dip_males.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_diploid_males.mt", overwrite=True)
+    mtX_dip_females = mtX_dip_females.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_diploid_females.mt", overwrite=True)
+
 
     #Get par region
     rg = hl.get_reference('GRCh38')
