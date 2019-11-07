@@ -34,7 +34,7 @@ with open(f"{thresholds}", 'r') as f:
 
 
 
-def fix_genotpe(mt:hl.Matrixtable)-> hl.MatrixTable:
+def fix_genotpe(mt):
 
     pl_expr = (hl.zip_with_index(mt.PL).flatmap(lambda x: hl.range(x[0] + 1).map(lambda i: hl.cond(i == x[0], x[1], 999))))
     gt_allele = mt.GT.n_alt_alleles()
