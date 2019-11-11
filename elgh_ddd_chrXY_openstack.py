@@ -40,7 +40,7 @@ def fix_genotpe(mt):
     gt_allele = mt.GT.n_alt_alleles()
     gt_and_pl = (hl.switch(mt.GT.ploidy)
                  .when(1, (hl.call(gt_allele, gt_allele), pl_expr)
-                       .default((mt.GT, mt.PL))))
+                 .default((mt.GT, mt.PL))))
     mt = mt.annotate_entries(GT = gt_and_pl[0], PL = gt_and_pl[1])
 
     return mt

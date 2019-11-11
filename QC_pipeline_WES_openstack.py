@@ -91,8 +91,10 @@ if __name__ == "__main__":
     #5.Annotate COMMON AND RARE VARIANTS to apply separate filters
     print("Annotate COMMON AND RARE VARIANTS to apply separate filters")
     #mt_common = mt_filtered.filter_rows(mt_filtered.variant_qc.AF[1] > 0.05)
-    mt2 = mt2.annotate_rows(maf=hl.cond(mt2.variant_QC_Hail.AF[1] < 0.01, "< 1%",
-                                        hl.cond(mt2.variant_QC_Hail.AF[1] < 0.05, "1%-5%", ">5%")))
+    #### ADD for rate allele
+    mt2 = mt2.annotate_rows(maf=hl.cond(mt2.variant_QC_Hail.AF[1] < 0.01 | mt2.variant_QC_Hail.AF[1] >= 0.99 , "< 1%",
+                                        hl.cond(mt2.variant_QC_Hail.AF[1] < 0.05 | mt2.variant_QC_Hail.AF[1] > 0.95, "1%-5%", ">5%")
+                                        ))
 
 
     #6. Common variants  filtering:
@@ -179,7 +181,13 @@ if __name__ == "__main__":
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
 
     #Remove variants with missingness > 3%
-    mt= mt3.filter_rows(mt3.variant_QC_Hail.call_rate >= 0.97)
+    #TODO AC >=1
+    mt= mt3.filter_rows(
+    (mt3.variant_QC_Hail.call_rate >= 0.97) &
+    (mt3.variant_QC_Hail.AC[1] >= 1)
+    )
+
+
 
     print("Finished filtering. Now writing out.")
 
