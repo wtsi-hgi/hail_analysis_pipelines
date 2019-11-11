@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print("3. Split multi and checkpoint ")
     mt_split = hl.split_multi_hts(mt_result, keep_star=False)
     mt_split = mt_split.checkpoint(
-        f"{tmp_dir}/intervalwes/WES_vqslod_split-multi_checkpoint.mt", overwrite=True)
+        f"{tmp_dir}/intervalwes/WES_vqslod_split-multi_checkpoint.mt", _read_if_exists= True)
 
     # 4. annotate SNPs,indels
     print('Annotating rows with snp and indel info')
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     print("Annotate COMMON AND RARE VARIANTS to apply separate filters")
     #mt_common = mt_filtered.filter_rows(mt_filtered.variant_qc.AF[1] > 0.05)
     #### ADD for rate allele
-    mt2 = mt2.annotate_rows(maf=hl.cond(mt2.variant_QC_Hail.AF[1] < 0.01 | mt2.variant_QC_Hail.AF[1] >= 0.99 , "< 1%",
-                                        hl.cond(mt2.variant_QC_Hail.AF[1] < 0.05 | mt2.variant_QC_Hail.AF[1] > 0.95, "1%-5%", ">5%")
+    mt2 = mt2.annotate_rows(maf=hl.cond(((mt2.variant_QC_Hail.AF[1] < 0.01) | (mt2.variant_QC_Hail.AF[1] >= 0.99)), "< 1%",
+                                        hl.cond( ((mt2.variant_QC_Hail.AF[1] < 0.05) | (mt2.variant_QC_Hail.AF[1] > 0.95)), "1%-5%", ">5%")
                                         ))
 
 
