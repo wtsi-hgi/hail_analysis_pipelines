@@ -50,9 +50,13 @@ if __name__ == "__main__":
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
     #Haploid VCF fixing of GT
+    print("renaming original GT")
+    chrX_renamed=chrX.rename({'GT':'GT_original'})
+    chrY_renamed = chrY.rename({'GT': 'GT_original'})
     print("Fix GT haploid")
-    chrX=fix_genotpe(chrX)
-    chrY=fix_genotpe(chrY)
+    chrX=fix_genotpe(chrX_renamed)
+    chrY=fix_genotpe(chrY_renamed)
+    print("Writin out matrixtables")
     CHROMOSOME="chrX"
     chrX.write(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_GT_fixed.mt", overwrite=True)
     CHROMOSOME = "chrY"
