@@ -66,12 +66,12 @@ if __name__ == "__main__":
     chrX_haploid_vcf_path= storage["elghddd"]["s3"]["chrXhap"]
     chrX_diploid_vcf_path= storage["elghddd"]["s3"]["chrXdip"]
     chrY_haploid_vcf_path= storage["elghddd"]["s3"]["chrYhap"]
-    chrY_diploid_vcf_path= storage["elghddd"]["s3"]["chrYdip"]
+    #chrY_diploid_vcf_path= storage["elghddd"]["s3"]["chrYdip"]
     print("Read in all VCFs:")
     mtX_hap = hl.import_vcf(chrX_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     mtX_dip = hl.import_vcf(chrX_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     mtY_hap = hl.import_vcf(chrY_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
-    mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
+    #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
     #Haploid VCF fixing of GT
     print("Fix GT haploid")
@@ -80,6 +80,12 @@ if __name__ == "__main__":
     mtX_hap = mtX_hap.checkpoint(f"{tmp_dir}/elgh-ddd/chrX_haploid_GT_fixed.mt", overwrite=True)
     mtY_hap = mtY_hap.checkpoint(f"{tmp_dir}/elgh-ddd/chrY_haploid_GT_fixed.mt", overwrite=True)
 
+
+
+
+
+
+    ############################### chrX
     CHROMOSOME = "chrX"
     print(f"Split multi_hts {CHROMOSOME} diploid VCF calls")
     mtX_dip_split = hl.split_multi_hts(mtX_dip, keep_star = False)
@@ -94,12 +100,18 @@ if __name__ == "__main__":
     mtx_unphased = mtX_dip_split.select_entries(GT=hl.unphased_diploid_gt_index_call(mtX_dip_split.GT.n_alt_alleles()))
     imputed_sex = hl.impute_sex(mtx_unphased.GT)
 
-
-    #Annotate samples male or female:
-    #mt = mt_split.annotate_cols(
-    #    sex=hl.cond(imputed_sex[mtX_hap_split.s].is_female, "female","male")
-    #
-    #
+    ################## chrY
+    print("chrY  surgery")
+    mtY_hap_split = hl.split_multi_hts(mtY_hap, keep_star=False)
+    call1 = hl.eval(hl.call(0, 0))
+    mtY_hap_sex_annot = mtY_hap_split.annotate_cols(
+        sex=hl.cond(imputed_sex[mtY_hap_split.s].is_female, "female", "male"))
+    mtY_hap_sex_annot = mtY_hap_sex_annot.annotate_entries(
+        GT=hl.cond(mtY_hap_sex_annot.sex == "female", call1, mtY_hap_sex_annot.GT))
+    print("Checkpoint chrY")
+    mtY_hap_sex_annot= mtY_hap_sex_annot.checkpoint(f"{tmp_dir}/elgh-ddd/chrY_haploid_final.mt", overwrite=True)
+    print("Export chrY VCF")
+    hl.export_vcf(mtY_hap_sex_annot, f"{tmp_dir}/elgh-ddd/elgh-ddd-chrY-surgery_final.vcf.bgz")
 
     #Haploid VCF: filter to male samples only
     print("Haploid chrX VCF: filter to male samples only")
@@ -137,5 +149,5 @@ if __name__ == "__main__":
     mt_final = mt_final.checkpoint(
         f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX_surgery.mt", overwrite=True)
     print("Export VCF")
-    hl.export_vcf(mt_final, f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX-surgery.vcf.bgz")
+    hl.export_vcf(mt_final, f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX-surgery_final.vcf.bgz")
 
