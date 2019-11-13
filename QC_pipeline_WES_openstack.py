@@ -187,8 +187,14 @@ if __name__ == "__main__":
     (mt3.variant_QC_Hail.AC[1] >= 1)
     )
 
+    fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
 
+    mt1 = mt.drop(*fields_to_drop)
 
+    mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
+    mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
+
+    mt=mt3
     print("Finished filtering. Now writing out.")
 
     #8.Export VCF only variants -no genotypes
@@ -197,6 +203,13 @@ if __name__ == "__main__":
     mt2 = mt1.filter_cols(mt1['s'] == 'samplenone')
     hl.export_vcf(mt2, f"{tmp_dir}/intervalwes/VCFs/exome.vcf.bgz")
 
+    #Export sample QC
+    mt_sqc = hl.sample_qc(mt, name='sample_QC_Hail')
+
+    panda_df_unfiltered_table = mt_sqc.cols().flatten()
+
+    print("Outputting table of sample qc")
+    panda_df_unfiltered_table.export(f"{tmp_dir}/output-intervalwes/WES_sampleQC_final.tsv.bgz", header=True)
     #9. Write matrixtable
     print("Write matrixtable")
     mt = mt.checkpoint(f"{tmp_dir}/intervalwes/exome_filtered_FINAL.mt",  overwrite=True)
