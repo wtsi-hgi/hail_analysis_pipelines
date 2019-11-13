@@ -71,7 +71,7 @@ if __name__ == "__main__":
                             force_bgz=True,
                             reference_genome='GRCh38',
                             array_elements_required=False,
-                            header=storage["intervalwgs"]["s3"]["chrX_header"],
+                            header_file=storage["intervalwgs"]["s3"]["chrX_header"],
                             min_partitions=450)
     mtX_dip = hl.read_matrixtable(chrX_diploid)
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
