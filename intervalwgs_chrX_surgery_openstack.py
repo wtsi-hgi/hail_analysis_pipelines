@@ -78,12 +78,14 @@ if __name__ == "__main__":
     if mtX_hap.n_partitions() > partitions:
         mtX_hap = mtX_hap.naive_coalesce(partitions)
 
+    print("Repartioining and writing to disk  haploid chrX:")
+    mtX_hap = mtX_hap.checkpoint(f"{tmp_dir}/checkpoints/chrX_haploid_repartitioned.mt", overwrite=True)
+
     mtX_dip = hl.read_matrix_table(chrX_diploid)
     if mtX_dip.n_partitions() > partitions:
         mtX_dip = mtX_dip.naive_coalesce(partitions)
 
-    print("Repartioining and writing to disk for both haploid and diploid chrX:")
-    mtX_hap = mtX_dip.checkpoint(f"{tmp_dir}/checkpoints/chrX_haploid_repartitioned.mt", overwrite=True)
+    print("Repartioining and writing to disk diploid chrX:")
     mtX_dip = mtX_dip.checkpoint(f"{tmp_dir}/checkpoints/chrX_repartitioned.mt", overwrite=True)
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
