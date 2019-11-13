@@ -70,7 +70,7 @@ if __name__ == "__main__":
     mtX_hap = hl.import_vcf(chrX_haploid_vcf_path,
                             force_bgz=True,
                             reference_genome='GRCh38',
-                            rray_elements_required=False,
+                            array_elements_required=False,
                             header=storage["intervalwgs"]["s3"]["chrX_header"],
                             min_partitions=450)
     mtX_dip = hl.read_matrixtable(chrX_diploid)
