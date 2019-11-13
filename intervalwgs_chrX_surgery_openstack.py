@@ -73,7 +73,7 @@ if __name__ == "__main__":
                             array_elements_required=False,
                             header_file=storage["intervalwgs"]["s3"]["chrX_header"],
                             min_partitions=450)
-    mtX_dip = hl.read_matrixtable(chrX_diploid)
+    mtX_dip = hl.read_matrix_table(chrX_diploid)
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
     #Haploid VCF fixing of GT
