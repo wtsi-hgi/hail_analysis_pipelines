@@ -67,7 +67,12 @@ if __name__ == "__main__":
     chrX_diploid= storage["intervalwgs"]["s3"]["chrXdip"]
     #chrY_diploid_vcf_path= storage["elghddd"]["s3"]["chrYdip"]
     print("Read in all VCFs:")
-    mtX_hap = hl.import_vcf(chrX_haploid_vcf_path, force_bgz=True, reference_genome='GRCh38',header=storage["intervalwgs"]["s3"]["chrX_header"])
+    mtX_hap = hl.import_vcf(chrX_haploid_vcf_path,
+                            force_bgz=True,
+                            reference_genome='GRCh38',
+                            rray_elements_required=False,
+                            header=storage["intervalwgs"]["s3"]["chrX_header"],
+                            min_partitions=450)
     mtX_dip = hl.read_matrixtable(chrX_diploid)
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
