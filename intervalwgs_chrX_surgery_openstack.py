@@ -63,6 +63,7 @@ if __name__ == "__main__":
     ###################### chromosome X  ##############################
     #####################################################################
     #DEFINE INPUT FILE PATHS
+    partitions=450
     chrX_haploid_vcf_path= storage["intervalwgs"]["s3"]["chrXhap"]
     chrX_diploid= storage["intervalwgs"]["s3"]["chrXdip"]
     #chrY_diploid_vcf_path= storage["elghddd"]["s3"]["chrYdip"]
@@ -73,7 +74,17 @@ if __name__ == "__main__":
                             array_elements_required=False,
                             header_file=storage["intervalwgs"]["s3"]["chrX_header"],
                             min_partitions=450)
+
+    if mtX_hap.n_partitions() > partitions:
+        mtX_hap = mtX_hap.naive_coalesce(partitions)
+
     mtX_dip = hl.read_matrix_table(chrX_diploid)
+    if mtX_dip.n_partitions() > partitions:
+        mtX_dip = mtX_dip.naive_coalesce(partitions)
+
+    print("Repartioining and writing to disk for both haploid and diploid chrX:")
+    mtX_hap = mtX_dip.checkpoint(f"{tmp_dir}/checkpoints/chrX_haploid_repartitioned.mt", overwrite=True)
+    mtX_dip = mtX_dip.checkpoint(f"{tmp_dir}/checkpoints/chrX_repartitioned.mt", overwrite=True)
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
     #Haploid VCF fixing of GT
