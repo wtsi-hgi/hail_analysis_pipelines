@@ -44,8 +44,8 @@ if __name__ == "__main__":
 
 
     #DEFINE INPUT FILE PATHS
-    chrX = hl.read_matrix_table('gs://interval-wgs/new-mts/chrX.mt')
-    chrY = hl.read_matrix_table('gs://interval-wgs/new-mts/chrY.mt')
+    chrX=hl.read_matrix_table('gs://interval-wgs/chrX.mt')
+    chrY=hl.read_matrix_table('gs://interval-wgs/chrY.mt')
 
     #mtY_dip = hl.import_vcf(chrY_diploid_vcf_path, force_bgz=True, reference_genome='GRCh38')
     ############################
