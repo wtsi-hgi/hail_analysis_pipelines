@@ -140,14 +140,31 @@ if __name__ == "__main__":
     mtX_dip_males_PAR = hl.filter_intervals(mtX_dip_males, par, keep = True)
 
     #The hap and dip VCF files differ in entry fielse. Dropping these fields to allow union_rows and union_cols to proceed
-    fields_to_drop = ['PGT', 'PID', 'PS']
-
+    fields_to_drop = ['PGT', 'PID']
     mtX_dip_males_PAR_dropf = mtX_dip_males_PAR.drop(*fields_to_drop)
     mtX_dip_females_dropf = mtX_dip_females.drop(*fields_to_drop)
+    info_fields_to_drop = ['AS_BaseQRankSum',
+                           'AS_FS',
+                           'AS_InbreedingCoeff',
+                           'AS_MQ',
+                           'AS_MQRankSum',
+                           'AS_QD',
+                           'AS_ReadPosRankSum',
+                           'AS_SOR',
+                           'RAW_MQandDP',
+                           'DB']
+    fields_to_drop_secondmt = ['ClippingRankSum', 'RAW_MQ']
+    info1 = mtX_hap_males_NONPAR.info.drop(*info_fields_to_drop)
+    info2 = mtX_dip_males_PAR_dropf.info.drop(*fields_to_drop_secondmt)
+
+    mtX_hap_males_NONPAR = mtX_hap_males_NONPAR.annotate_rows(info=info1)
+    mtX_dip_males_PAR_dropf = mtX_dip_males_PAR_dropf.annotate_rows(info=info2)
+    mtX_dip_males_PAR_dropf = mtX_dip_males_PAR_dropf.annotate_entries(SB=mtX_dip_males_PAR_dropf.SB.map(lambda x: x))
     mtX_union_males = mtX_hap_males_NONPAR.union_rows(mtX_dip_males_PAR_dropf)
 
-
+    mtX_dip_females_dropf = mtX_dip_females_dropf.annotate_entries(SB=mtX_dip_females_dropf.SB.map(lambda x: x))
     mt_final = mtX_union_males.union_cols(mtX_dip_females_dropf)
+
     print("Output matrixtable:")
     mt_final = mt_final.checkpoint(
         f"{tmp_dir}/checkpoints/chrX_surgery_FINAL.mt", overwrite=True)
