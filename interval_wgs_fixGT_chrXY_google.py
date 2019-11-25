@@ -54,7 +54,7 @@ if __name__ == "__main__":
     chrX_renamed=chrX.rename({'GT':'GT_original'})
     chrY_renamed = chrY.rename({'GT': 'GT_original'})
     print("Fix GT haploid")
-    chrX=fix_genotpe(chrX_renamed)
+    #chrX=fix_genotpe(chrX_renamed)
     chrY=fix_genotpe(chrY_renamed)
     print("Writin out matrixtables")
     CHROMOSOME="chrX"

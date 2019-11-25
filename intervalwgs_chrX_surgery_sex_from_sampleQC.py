@@ -110,24 +110,29 @@ if __name__ == "__main__":
     mtX_dip_split = mtX_dip_split.checkpoint(f"{tmp_dir}/checkpoints/chrX_diploid_split.mt", overwrite=True)
     mtX_hap_split = mtX_hap_split.checkpoint(f"{tmp_dir}/checkpoints/chrX_haploid_split.mt", overwrite=True)
 
-
+    #New sex imputation code from here"
 
     ####### sex imputation
-    print("Sex imputation:")
-    mtx_unphased = mtX_dip_split.select_entries(GT=hl.unphased_diploid_gt_index_call(mtX_dip_split.GT.n_alt_alleles()))
-    imputed_sex = hl.impute_sex(mtx_unphased.GT)
+    print("Sex from Sample QC:")
+    mtX_dip_split_annotated = mtX_dip_split.annotate_cols(sex=sample_QC_nonHail.key_by("ID")[mtX_dip_split.s].SEX)
+    mtX_dip_split_annotated = mtX_dip_split.annotate_cols(sex=sample_QC_nonHail.key_by("ID")[mtX_dip_split.s].SEX)
+    mtX_hap_split_annotated= mtX_hap_split.annotate_cols(sex=sample_QC_nonHail.key_by("ID")[mtX_hap_split.s].SEX)
+    #mtx_unphased = mtX_dip_split.select_entries(GT=hl.unphased_diploid_gt_index_call(mtX_dip_split.GT.n_alt_alleles()))
+    #imputed_sex = hl.impute_sex(mtx_unphased.GT)
 
 
 
     #Haploid VCF: filter to male samples only
     print("Haploid chrX VCF: filter to male samples only")
-    mtX_hap_males = mtX_hap_split.filter_cols(imputed_sex[mtX_hap_split.s].is_female, keep=False)
+    #mtX_hap_males = mtX_hap_split.filter_cols(imputed_sex[mtX_hap_split.s].is_female, keep=False)
+    mtX_hap_males = mtX_hap_split_annotated.filter_cols(mtX_hap_split_annotated.sex==1, keep=True)
+
     mtX_hap_males = mtX_hap_males.checkpoint(f"{tmp_dir}/checkpoints/chrX_haploid_males.mt", overwrite=True)
 
     #Diploid vcf: one matrixtable only Female, one matrixtable only male
     print("Diploid chrX vcf: create new matrixtable one for males one for female samples")
-    mtX_dip_males = mtX_dip_split.filter_cols(imputed_sex[mtX_dip_split.s].is_female, keep = False)
-    mtX_dip_females = mtX_dip_split.filter_cols(imputed_sex[mtX_dip_split.s].is_female, keep = True)
+    mtX_dip_males = mtX_dip_split_annotated.filter_cols(mtX_dip_split_annotated.sex==1, keep = True)
+    mtX_dip_females = mtX_dip_split_annotated.filter_cols(mtX_dip_split_annotated.sex==1, keep=False)
     mtX_dip_males = mtX_dip_males.checkpoint(f"{tmp_dir}/checkpoints/chrX_diploid_males.mt", overwrite=True)
     mtX_dip_females = mtX_dip_females.checkpoint(f"{tmp_dir}/checkpoints/chrX_diploid_females.mt", overwrite=True)
 
