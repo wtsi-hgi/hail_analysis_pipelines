@@ -53,13 +53,15 @@ if __name__ == "__main__":
     #Define the hail persistent storage directory
     hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
 
-
+    fields_to_drop_secondmt = ['ClippingRankSum', 'RAW_MQ']
     mt_chr1 = hl.read_matrix_table(f"{BUCKET}/checkpoints/chr1/chr1-split-multi_checkpoint.mt")
-
+    mt_chr1 = mt_chr1.info.drop(*fields_to_drop_secondmt)
 
     for CHROMOSOME in CHROMOSOMES:
         print(f"Reading chromosome {CHROMOSOME}")
         mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
+        if CHROMOSOME!="chrX" and CHROMOSOME !="chrY":
+            mt = mt.info.drop(*fields_to_drop_secondmt)
         mt_chr1 = mt_chr1.union_rows(mt)
 
     CHROMOSOME = "WGS"
