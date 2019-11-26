@@ -58,6 +58,8 @@ if __name__ == "__main__":
     mt_chr1=mt_chr1.drop(*fields_to_drop)
     info2 = mt_chr1.info.drop(*fields_to_drop_secondmt)
     mt_chr1 = mt_chr1.annotate_rows(info=info2)
+    mt_chr1 = mt_chr1.annotate_entries(SB=mt_chr1.SB.map(lambda x: x))
+
 
     for CHROMOSOME in CHROMOSOMES:
         print(f"Reading chromosome {CHROMOSOME}")
@@ -66,6 +68,7 @@ if __name__ == "__main__":
             mt = mt.drop(*fields_to_drop)
             info2 = mt.info.drop(*fields_to_drop_secondmt)
             mt = mt.annotate_rows(info=info2)
+            mt = mt.annotate_entries(SB=mt.SB.map(lambda x: x))
         mt_chr1 = mt_chr1.union_rows(mt)
 
     CHROMOSOME = "WGSd"
