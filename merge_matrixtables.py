@@ -63,7 +63,7 @@ if __name__ == "__main__":
         print(f"Reading chromosome {CHROMOSOME}")
         mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
         if CHROMOSOME!="chrX" and CHROMOSOME !="chrY":
-            mt = mt.fields_to_drop(*fields_to_drop)
+            mt = mt.drop(*fields_to_drop)
             info2 = mt.info.drop(*fields_to_drop_secondmt)
             mt = mt.annotate_rows(info=info2)
         mt_chr1 = mt_chr1.union_rows(mt)
