@@ -40,7 +40,7 @@ CHROMOSOMES = ["chr2",
                "chr19",
                "chr20",
                "chr21",
-               "chr22"
+               "chr22",
                "chrX",
                "chrY"
                ]
@@ -58,11 +58,12 @@ if __name__ == "__main__":
 
 
     for CHROMOSOME in CHROMOSOMES:
+        print(f"Reading chromosome {CHROMOSOME}")
         mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
         mt_chr1 = mt_chr1.union_rows(mt)
 
     CHROMOSOME = "WGS"
-
+    print("Finished merging successfully!!!!! ")
 
 
     #####################################################################
@@ -72,7 +73,7 @@ if __name__ == "__main__":
 
     mt2 = hl.sample_qc(mt_chr1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
-
+    print("Writing out")
     mt3 = mt3.checkpoint(
         f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-UNFILTERED.mt", overwrite=True)
     mt3_cols = mt3.cols()
