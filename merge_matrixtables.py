@@ -52,9 +52,10 @@ if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     #Define the hail persistent storage directory
     hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
-
+    fields_to_drop = ['PGT', 'PID']
     fields_to_drop_secondmt = ['ClippingRankSum', 'RAW_MQ']
     mt_chr1 = hl.read_matrix_table(f"{BUCKET}/checkpoints/chr1/chr1-split-multi_checkpoint.mt")
+    mt_chr1=mt_chr1.drop(*fields_to_drop)
     info2 = mt_chr1.info.drop(*fields_to_drop_secondmt)
     mt_chr1 = mt_chr1.annotate_rows(info=info2)
 
@@ -62,6 +63,7 @@ if __name__ == "__main__":
         print(f"Reading chromosome {CHROMOSOME}")
         mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
         if CHROMOSOME!="chrX" and CHROMOSOME !="chrY":
+            mt = mt.fields_to_drop(*fields_to_drop)
             info2 = mt.info.drop(*fields_to_drop_secondmt)
             mt = mt.annotate_rows(info=info2)
         mt_chr1 = mt_chr1.union_rows(mt)
