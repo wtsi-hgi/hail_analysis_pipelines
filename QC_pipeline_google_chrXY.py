@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # Give chromosome as input to program with chr prefix i.e chr1, chr2, chr3 etc
     CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
-    mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}_GT_fixed_NEW.mt")
+    mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}_GT_fixed_NEW.mt")
 
     #mt = mt.key_rows_by('locus').distinct_by_row().key_rows_by('locus', 'alleles')
 
