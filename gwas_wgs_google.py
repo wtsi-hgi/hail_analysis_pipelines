@@ -111,11 +111,13 @@ if __name__ == "__main__":
     ja = ja.annotate(gws_gwa_map=gws_gwa_map[ja['ID']])
     fbc = full_blood_count.key_by('Wgs_RAW_bl')
     ja = ja.annotate(fbc=full_blood_count[ja.gws_gwa_map.Wgs_RAW_bl])
-
+    fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
     mt_chr1 = hl.read_matrix_table(f"{BUCKET}/matrixtables/chr1/chr1-full-sampleqc-variantqc-filtered-FINAL.mt")
+    mt_chr1 = mt_chr1.drop(*fields_to_drop)
 
     for CHROMOSOME in CHROMOSOMES:
         mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
+        mt = mt.drop(*fields_to_drop)
         mt_chr1 = mt_chr1.union_rows(mt)
 
     CHROMOSOME = "WGS"
@@ -131,9 +133,7 @@ if __name__ == "__main__":
     ###################### FINAL QC AFTER FILTERING  ####################
     #####################################################################
 
-    fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
 
-    mt1 = mt.drop(*fields_to_drop)
 
     mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
