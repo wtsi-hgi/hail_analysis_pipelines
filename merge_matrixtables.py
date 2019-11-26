@@ -55,16 +55,18 @@ if __name__ == "__main__":
 
     fields_to_drop_secondmt = ['ClippingRankSum', 'RAW_MQ']
     mt_chr1 = hl.read_matrix_table(f"{BUCKET}/checkpoints/chr1/chr1-split-multi_checkpoint.mt")
-    mt_chr1 = mt_chr1.info.drop(*fields_to_drop_secondmt)
+    info2 = mt_chr1.info.drop(*fields_to_drop_secondmt)
+    mt_chr1 = mt_chr1.annotate_rows(info=info2)
 
     for CHROMOSOME in CHROMOSOMES:
         print(f"Reading chromosome {CHROMOSOME}")
         mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
         if CHROMOSOME!="chrX" and CHROMOSOME !="chrY":
-            mt = mt.info.drop(*fields_to_drop_secondmt)
+            info2 = mt.info.drop(*fields_to_drop_secondmt)
+            mt = mt.annotate_rows(info=info2)
         mt_chr1 = mt_chr1.union_rows(mt)
 
-    CHROMOSOME = "WGS"
+    CHROMOSOME = "WGSd"
     print("Finished merging successfully!!!!! ")
 
 
