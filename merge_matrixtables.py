@@ -41,52 +41,9 @@ CHROMOSOMES = ["chr2",
                "chr20",
                "chr21",
                "chr22"
+               "chrX",
+               "chrY"
                ]
-               #"chrX",
-               #"chrY"
-               #]
-
-
-
-covariates =[
-    "neut_p_gwas_normalised",
-    "eo_p_gwas_normalised",
-    "mono_p_gwas_normalised",
-   "lymph_p_gwas_normalised",
-    "baso_p_gwas_normalised",
-   "ret_p_gwas_normalised",
-   "hlr_p_gwas_normalised",
-   "hct_gwas_normalised",
-   "pct_gwas_normalised",
-   "hgb_gwas_normalised",
-   "rbc_gwas_normalised",
-   "wbc_gwas_normalised",
-   "mpv_gwas_normalised",
-   "plt_gwas_normalised",
-   "rdw_gwas_normalised",
-   "pdw_gwas_normalised",
-   "mcv_gwas_normalised",
-   "mch_gwas_normalised",
-   "mchc_gwas_normalised",
-   "ret_gwas_normalised",
-   "hlr_gwas_normalised",
-   "neut_gwas_normalised",
-   "mono_gwas_normalised",
-   "baso_gwas_normalised",
-   "eo_gwas_normalised",
-   "lymph_gwas_normalised",
-   "irf_gwas_normalised",
-   "myeloid_wbc_gwas_normalised",
-   "gran_gwas_normalised",
-   "eo_baso_sum_gwas_normalised",
-   "neut_eo_sum_gwas_normalised",
-   "baso_neut_sum_gwas_normalised",
-   "gran_p_myeloid_wbc_gwas_normalised",
-   "eo_p_gran_gwas_normalised",
-   "neut_p_gran_gwas_normalised",
-   "baso_p_gran_gwas_normalised"
-
-]
 
 
 
@@ -104,7 +61,7 @@ if __name__ == "__main__":
         mt = hl.read_matrix_table(f"{BUCKET}/checkpoints/{CHROMOSOME}/{CHROMOSOME}-split-multi_checkpoint.mt")
         mt_chr1 = mt_chr1.union_rows(mt)
 
-    CHROMOSOME = "WGS-autosomes"
+    CHROMOSOME = "WGS"
 
 
 
