@@ -40,7 +40,7 @@ CHROMOSOMES = ["chr2",
                "chr19",
                "chr20",
                "chr21",
-               "chr22"
+               "chr22",
                "chrX",
                "chrY"
                ]
