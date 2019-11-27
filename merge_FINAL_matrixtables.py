@@ -56,6 +56,8 @@ if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     #Define the hail persistent storage directory
     hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
+   
+
     fields_to_drop = ['PGT', 'PID']
     fields_to_drop_secondmt = ['ClippingRankSum', 'RAW_MQ']
     mt_chr1 = hl.read_matrix_table(f"{BUCKET}/matrixtables/chr1/chr1-full-sampleqc-variantqc-filtered-FINAL.mt")
@@ -83,10 +85,11 @@ if __name__ == "__main__":
     ###################### QC ####################
     #####################################################################
 
-    mt_no_entries = mt_chr1.select_entries()
-    mt_no_samples = mt_no_entries.filter_cols(mt_no_entries['s'] =='sample')
-    hl.export_vcf(mt_no_samples, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}_nosamples_VEP.vcf.bgz")
-
+    #mt_no_entries = mt_chr1.select_entries()
+    #hl.export_vcf(mt_no_samples, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}_nosamples_VEP.vcf.bgz")
+    ##mt_no_samples = mt_no_entries.filter_cols(mt_no_entries['s'] =='sample')
+    dropf=['variant_QC_Hail', 'sample_QC_Hail']
+    mt_chr1= mt_chr1.drop(*dropf)
     mt2 = hl.sample_qc(mt_chr1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
     print("Writing out")
