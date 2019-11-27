@@ -71,7 +71,7 @@ if __name__ == "__main__":
             mt = mt.annotate_entries(SB=mt.SB.map(lambda x: x))
         mt_chr1 = mt_chr1.union_rows(mt)
 
-    CHROMOSOME = "WGSd"
+    CHROMOSOME = "WGS_unfiltered"
     print("Finished merging successfully!!!!! ")
 
 
