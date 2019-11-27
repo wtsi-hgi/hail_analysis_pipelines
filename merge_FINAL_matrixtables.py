@@ -83,6 +83,9 @@ if __name__ == "__main__":
     ###################### QC ####################
     #####################################################################
 
+    mt_no_entries = mt_chr1.select_entries()
+    mt_no_samples = mt_no_entries.filter_cols(mt_no_entries['s'] =='sample')
+    hl.export_vcf(mt_no_samples, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}_nosamples_VEP.vcf.bgz")
 
     mt2 = hl.sample_qc(mt_chr1, name='sample_QC_Hail')
     mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
