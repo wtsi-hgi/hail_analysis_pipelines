@@ -86,8 +86,8 @@ if __name__ == "__main__":
     #####################################################################
 
     #mt_no_entries = mt_chr1.select_entries()
+    #mt_no_samples = mt_no_entries.filter_cols(mt_no_entries['s'] =='sample')
     #hl.export_vcf(mt_no_samples, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}_nosamples_VEP.vcf.bgz")
-    ##mt_no_samples = mt_no_entries.filter_cols(mt_no_entries['s'] =='sample')
     dropf=['variant_QC_Hail', 'sample_QC_Hail']
     mt_chr1= mt_chr1.drop(*dropf)
     mt2 = hl.sample_qc(mt_chr1, name='sample_QC_Hail')

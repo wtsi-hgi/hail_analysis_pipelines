@@ -84,8 +84,26 @@ covariates =[
    "eo_p_gran_gwas_normalised",
    "neut_p_gran_gwas_normalised",
    "baso_p_gran_gwas_normalised"
-
 ]
+ #   "Metabolon_met_RAW_bl",
+  #  "Brainshake_QC_bl",
+ ##   "Affymetrix_QC_bl",
+ #   "Metabolon_met_QC_bl",
+ #   "Metabolon_lip_QC_bl",
+ #   "Affymetrix_gwasQC_bl",
+ ##   "soma1129_QC_bl",
+ #   "Brainshake_gwasQC_bl",
+ #   "Metabolon_met_gwasQC_bl",
+ #   "soma1129_gwasQC_bl",
+ #   "Olink_cvd2_QC_24m",
+ #   "Olink_inf_QC_24m",
+ ##   "Olink_cvd3_QC_24m",
+ #   "Olink_neu_QC_24m",
+ #   "Olink_cvd2_gwasQC_24m",
+ #   "Olink_cvd3_gwasQC_24m",
+ #   "Olink_inf_gwasQC_24m",
+ #   "Olink_neu_gwasQC_24m",
+#]
 
 
 
@@ -95,10 +113,7 @@ if __name__ == "__main__":
     #Define the hail persistent storage directory
     hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
 
-    VQSLOD_snps = hl.import_table(f"{BUCKET}/qc-files/VQSLOD_snps.bgz",
-                                  types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
-    VQSLOD_indels = hl.import_table(f"{BUCKET}/qc-files/VQSLOD_indels.bgz",
-                                    types={"Locus": "locus<GRCh38>", "VQSLOD": hl.tfloat64})
+    
     sample_QC_nonHail = hl.import_table("gs://interval-wgs/qc-files/INTERVAL_WGS_Sample_QC_04-09-2019.txt", impute=True)
     gws_gwa_map = hl.import_table(f"{BUCKET}/qc-files/WGS-2-GWA_omicsMap.txt", impute=True)
 
@@ -111,44 +126,14 @@ if __name__ == "__main__":
     ja = ja.annotate(gws_gwa_map=gws_gwa_map[ja['ID']])
     fbc = full_blood_count.key_by('Wgs_RAW_bl')
     ja = ja.annotate(fbc=full_blood_count[ja.gws_gwa_map.Wgs_RAW_bl])
-    fields_to_drop = ['variant_QC_Hail', 'sample_QC_Hail']
-    mt_chr1 = hl.read_matrix_table(f"{BUCKET}/matrixtables/chr1/chr1-full-sampleqc-variantqc-filtered-FINAL.mt")
-    mt_chr1 = mt_chr1.drop(*fields_to_drop)
+    
+    #after having merged chromosomes and done new sample and variant qc with merge_matrixtables_FINAL.py
 
-    for CHROMOSOME in CHROMOSOMES:
-        mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
-        mt = mt.drop(*fields_to_drop)
-        mt_chr1 = mt_chr1.union_rows(mt)
-
-    CHROMOSOME = "WGS"
-
-
-
+    CHROMOSOME="WGS_filtered"
+    mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered.mt")
+    
     print("Annotating matrixtable with fbc:")
-    mt = mt_chr1.annotate_cols(sample_qc_and_phenotype=ja[mt_chr1.s])
-
-
-
-    #####################################################################
-    ###################### FINAL QC AFTER FILTERING  ####################
-    #####################################################################
-
-    mt_no_entries = mt.select_entries()
-    mt_no_samples = mt_no_entries.filter_cols(mt_no_entries['s'] =='sample')
-    hl.export_vcf(mt_no_samples, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}_nosamples_VEP.vcf.bgz")
-
-    mt2 = hl.sample_qc(mt1, name='sample_QC_Hail')
-    mt3 = hl.variant_qc(mt2, name='variant_QC_Hail')
-
-    mt3 = mt3.checkpoint(
-        f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt", overwrite=True)
-    mt3_cols = mt3.cols()
-    mt3_cols.flatten().export(
-        f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}-sampleQC_filtered_FINAL.tsv.bgz", header=True)
-
-    mt3_rows = mt3.rows()
-    mt3_rows.select(mt3_rows.variant_QC_Hail).flatten().export(
-        f"{BUCKET}/output-tables/{CHROMOSOME}/{CHROMOSOME}-variantQC_filtered_FINAL.tsv.bgz", header=True)
+    mt = mt.annotate_cols(sample_qc_and_phenotype=ja[mt.s])
 
     print("Linear regression")
     # TIM NOTE: I changed the below to show how linear_regression_rows can process groups of phenotypes in a vectorized way
@@ -189,7 +174,26 @@ if __name__ == "__main__":
             mt.sample_qc_and_phenotype.fbc.gran_p_myeloid_wbc_gwas_normalised,
             mt.sample_qc_and_phenotype.fbc.eo_p_gran_gwas_normalised,
             mt.sample_qc_and_phenotype.fbc.neut_p_gran_gwas_normalised,
-            mt.sample_qc_and_phenotype.fbc.baso_p_gran_gwas_normalised
+            mt.sample_qc_and_phenotype.fbc.baso_p_gran_gwas_normalised,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_met_RAW_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Affymetrix_QC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Brainshake_QC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_met_QC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_lip_QC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.soma1129_QC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Affymetrix_gwasQC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Brainshake_gwasQC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_met_gwasQC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.soma1129_gwasQC_bl,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd2_QC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd3_QC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_inf_QC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_neu_QC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd2_gwasQC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd3_gwasQC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_inf_gwasQC_24m,
+            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_neu_gwasQC_24m
+
             #                   mt.sample_qc_and_phenotype.fbc.wbc_gwas_normalised,
             #                   mt.sample_qc_and_phenotype.fbc.mpv_gwas_normalised],
         ],
