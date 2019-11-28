@@ -130,7 +130,7 @@ if __name__ == "__main__":
     #after having merged chromosomes and done new sample and variant qc with merge_matrixtables_FINAL.py
 
     CHROMOSOME="WGS_filtered"
-    mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered.mt")
+    mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-FILTERED.mt")
     
     print("Annotating matrixtable with fbc:")
     mt = mt.annotate_cols(sample_qc_and_phenotype=ja[mt.s])
@@ -175,24 +175,7 @@ if __name__ == "__main__":
             mt.sample_qc_and_phenotype.fbc.eo_p_gran_gwas_normalised,
             mt.sample_qc_and_phenotype.fbc.neut_p_gran_gwas_normalised,
             mt.sample_qc_and_phenotype.fbc.baso_p_gran_gwas_normalised,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_met_RAW_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Affymetrix_QC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Brainshake_QC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_met_QC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_lip_QC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.soma1129_QC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Affymetrix_gwasQC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Brainshake_gwasQC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Metabolon_met_gwasQC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.soma1129_gwasQC_bl,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd2_QC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd3_QC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_inf_QC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_neu_QC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd2_gwasQC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_cvd3_gwasQC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_inf_gwasQC_24m,
-            mt.sample_qc_and_phenotype.gws_gwa_map.Olink_neu_gwasQC_24m
+
 
             #                   mt.sample_qc_and_phenotype.fbc.wbc_gwas_normalised,
             #                   mt.sample_qc_and_phenotype.fbc.mpv_gwas_normalised],
