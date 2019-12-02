@@ -59,7 +59,8 @@ if __name__ == "__main__":
     #mt = hl.import_vcf(input_vcf,force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
 
   
-    mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/WES.mt")
+    #mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/WES.mt")
+    mt = hl.read_matrix_table(f"{tmp_dir}/intervalwes/WES_AFTER_surgery.mt")
     #2. Remove samples that have not passed initial QC:
     print("2. Remove samples that have not passed initial QC:")
     mt_result = mt.filter_cols(hl.is_defined(exclude_samples_table[mt.s]), keep=False)
@@ -215,6 +216,7 @@ if __name__ == "__main__":
     mt = mt.checkpoint(f"{tmp_dir}/intervalwes/exome_filtered_FINAL.mt",  overwrite=True)
     print("Finished writing mt. ")
 
-
+    mt = mt.checkpoint("s3a://intervalwes/exome_filtered_FINAL.mt",  overwrite=True)
+    print("Finished writing mt. ")
 
 

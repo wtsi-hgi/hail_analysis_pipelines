@@ -173,9 +173,12 @@ if __name__ == "__main__":
     mtX_dip_females_dropf = mtX_dip_females_dropf.annotate_entries(SB=mtX_dip_females_dropf.SB.map(lambda x: x))
     mt_final = mtX_union_males.union_cols(mtX_dip_females_dropf)
 
+    
     print("Output matrixtable:")
     mt_final = mt_final.checkpoint(
-        f"{tmp_dir}/checkpoints/chrX_surgery_FINAL.mt", overwrite=True)
+        f"{tmp_dir}/intervalwes/chrX_surgery_FINAL.mt", overwrite=True)
+
+    
     #print("Export VCF")
     #hl.export_vcf(mt_final, f"{tmp_dir}/elgh-ddd/elgh-ddd-chrX-surgery_final.vcf.bgz")
 
