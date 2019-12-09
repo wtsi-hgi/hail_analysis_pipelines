@@ -214,15 +214,15 @@ if __name__ == "__main__":
     XYfinal = XYfinal.checkpoint(
         f"{tmp_dir}/intervalwes/wes_chrXY_surgery_FINAL.mt", overwrite=True)
 
-    # #Join with WES autosomes
-    # wes=hl.read_matrix_table(f"{tmp_dir}/intervalwes/WES_vqslod_split-multi_checkpoint.mt")
+    #Join with WES autosomes
+    wes_autosomes=hl.read_matrix_table(f"{tmp_dir}/intervalwes/WES_autosomes.mt")
     # wes_autosomes=wes.filter_rows((wes.locus.contig == 'chrX') & (wes.locus.contig == 'chrY'), keep=False )
-    # fields_to_drop = ['PGT', 'PID','PS']
-    # wes_autosomes=wes_autosomes.drop(*fields_to_drop)
     # #multi split wes:
-
+    wes_autosomes=hl.split_multi_hts(wes_autosomes, keep_star=False)
+    wes_autosomes.checkpoint(f"{tmp_dir}/intervalwes/wes_chrXY_surgery_FINAL_SPLIT.mt", overwrite=True)
+    fields_to_drop = ['PGT', 'PID','PS']
+    wes_autosomes=wes_autosomes.drop(*fields_to_drop)
     # #join with wes
     # wes_autosomes=wes.filter_rows((wes.locus.contig == 'chrX') & (wes.locus.contig == 'chrY'), keep=False )
-    # wes_new=wes_autosomes.union_rows(XYfinal)
-
-    # wes_final=wes_new.checkpoint(f"{tmp_dir}/intervalwes/WES_AFTER_surgery.mt", overwrite=True)
+    wes_new=wes_autosomes.union_rows(XYfinal)
+    wes_final=wes_new.checkpoint(f"{tmp_dir}/intervalwes/WES_AFTER_surgery.mt", overwrite=True)
