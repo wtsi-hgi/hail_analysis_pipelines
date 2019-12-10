@@ -104,10 +104,10 @@ if __name__ == "__main__":
     #####################################################################    
     print("chrY  surgery")
     mtY_hap_split = hl.split_multi_hts(mtY_hap, keep_star=False)
-    call1 = hl.eval(hl.call(0, 0))
+
     mtY_hap_sex_annot = mtY_hap_split.annotate_cols(sex=sample_QC_nonHail.key_by("ega_sample_name")[mtY_hap_split.s].gender)
     mtY_hap_sex_annot = mtY_hap_sex_annot.annotate_entries(
-        GT=hl.cond(mtY_hap_sex_annot.sex == 2, call1, mtY_hap_sex_annot.GT))
+        GT=hl.or_missing(mtY_hap_sex_annot.sex == 1, mtY_hap_sex_annot.GT))
     
 
 
