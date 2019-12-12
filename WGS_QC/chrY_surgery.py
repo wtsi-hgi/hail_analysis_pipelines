@@ -11,7 +11,7 @@ import json
 import sys
 from pathlib import Path
 
-project_root=Path(__file__).parent.parent
+project_root=Path(__file__).parent.parent.parent
 
 
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["s3"]["sampleQC_non_hail"], impute=True)
 
     partitions=250
-    chrYhapVCF= "s3://intervalwgs/haploid/chrY"
+    chrYhapVCF= "s3a://intervalwgs/haploid/chrY"
     mt_hap=import_vcf(chrYhapVCF,partitions)
     mtY_hap= mtY_hap.checkpoint(f"{tmp_dir}/intervalwgs/haploidY.mt", overwrite=True)
 
