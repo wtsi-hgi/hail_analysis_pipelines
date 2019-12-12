@@ -73,11 +73,11 @@ if __name__ == "__main__":
 
     partitions=250
     chrYhapVCF= "s3a://intervalwgs/haploid/chrY"
-    mt_hap=import_vcf(chrYhapVCF,partitions)
+    mtY_hap=import_vcf(chrYhapVCF,partitions)
     mtY_hap= mtY_hap.checkpoint(f"{tmp_dir}/intervalwgs/haploidY.mt", overwrite=True)
 
     mtY_hap=fix_genotpe(mtY_hap)
-    mtY_hap = mtY_hap.checkpoint(f"{tmp_dir}/intervalwes/chrY_haploid_GT_fixed.mt", overwrite=True)
+    mtY_hap = mtY_hap.checkpoint(f"{tmp_dir}/intervalwgs/chrY_haploid_GT_fixed.mt", overwrite=True)
 
     #####################################################################
     ###################### chromosome Y  ##############################
