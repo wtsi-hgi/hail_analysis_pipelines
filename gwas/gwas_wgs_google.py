@@ -19,31 +19,24 @@ BUCKET = "gs://interval-wgs"
 #Define chromosome here
 tmp_dir="/Users/pa10/Programming/google-code/google/tmp"
 
-
-CHROMOSOMES = ["chr2",
-               "chr3",
-               "chr4",
-               "chr5",
-               "chr6",
-               "chr7",
-               "chr8",
-               "chr9",
-               "chr10",
-               "chr11",
-               "chr12",
-               "chr13",
-               "chr14",
-               "chr15",
-               "chr16",
-               "chr17",
-               "chr18",
-               "chr19",
-               "chr20",
-               "chr21",
-               "chr22",
-               "chrX",
-               "chrY"
-               ]
+""" 
+print(len(nmr))
+print(len(metabolon_metabolomics))
+print(len(olink_proteomics))
+print(len(somalogic_proteomics))
+print(len(fbc))
+print(len(pcas))
+print(len(nmr)+len(metabolon_metabolomics)+len(olink_proteomics)+len(somalogic_proteomics)+len(fbc)+len(pcas))
+print(len(ph1))
+230
+0
+372
+4035
+36
+10
+4683
+4683 
+"""
 
 
 nmr=[]
@@ -69,11 +62,11 @@ if __name__ == "__main__":
     print('Joining annotations')
     ja=phenotypes.key_by('ID')
 
-    gws_gwa_map = gws_gwa_map.key_by('unique_WGS_ID')
+    
 
     #after having merged chromosomes and done new sample and variant qc with merge_matrixtables_FINAL.py
 
-    CHROMOSOME="WGS_filtered"
+    CHROMOSOME="WGS-autosomes"
     mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-FILTERED.mt")
     
     
@@ -100,11 +93,14 @@ if __name__ == "__main__":
     op=mt.phenotype.select(*olink_proteomics)
     sp=mt.phenotype.select(*somalogic_proteomics)
     pcas1=mt.phenotype.select(*pcas)
+    phens=[mt.phenotype[i] for i in range(10,210)]
 
     print("Linear regression")
+    #y=[nmr1[0],fbc1[0], op[0],sp[0]],
+    #y=[nmr1[0],fbc1[0], op[0],sp[0]],
     # TIM NOTE: I changed the below to show how linear_regression_rows can process groups of phenotypes in a vectorized way
     gwas = hl.linear_regression_rows(
-        y=[nmr1[0],fbc1[0], op[0],sp[0]],
+        y=phens,
         x=mt.GT.n_alt_alleles(), covariates=[1.0, pcas1[0:10][0]], pass_through=[mt.rsid])
 
     # gwas = hl.linear_regression_rows(y=[[mt_filtered.sample_qc_and_phenotype.wbc_gwas_normalised, ...], [family2...]],
@@ -117,12 +113,12 @@ if __name__ == "__main__":
 
     print("Plotting")
 
-    for i in range(0, 36):
-        print(f"Plotting {i}:{[i]}")
-        p = hl.plot.manhattan(gwas.p_value[i], title=f"Interval WGS GWAS Manhattan Plot: {covariates[i]}")
-        output_file(f"{i}.WGS-manhattan-{covariates[i]}.html")
-        save(p)
-        hl.hadoop_copy(f"{i}.WGS-manhattan-{covariates[i]}.html", f"{BUCKET}/gwas/plots/")
+    #for i in range(len(nmr)):
+       # print(f"Plotting {i}:{nmr[i]}")
+       # p = hl.plot.manhattan(gwas.p_value[i], title=f"Interval WGS GWAS Manhattan Plot: {nmr[i]}")
+      #  output_file(f"{i}.WGS-manhattan-{nmr[i]}.html")
+       # save(p)
+       # hl.hadoop_copy(f"{i}.WGS-manhattan-{nmr[i]}.html", f"{BUCKET}/gwas/plots/")
 
        # p = hl.plot.qq(gwas.p_value[i], title=f"Interval WGS GWAS QQ Plot: {covariates[i]}")
         # export_png(p,f"{BUCKET}/output-tables/wgs-qq-{covariates[i]}.html")

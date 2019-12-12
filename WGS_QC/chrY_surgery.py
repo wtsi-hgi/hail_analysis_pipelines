@@ -102,8 +102,8 @@ if __name__ == "__main__":
                            'AS_SOR',
                            'RAW_MQandDP',
                            'DB']
-    #info1 = mtY_hap_sex_annot.info.drop(*info_fields_to_drop)
-    #mtY_hap_sex_annot = mtY_hap_sex_annot.annotate_rows(info=info1)
+    info1 = mtY_hap_sex_annot.info.drop(*info_fields_to_drop)
+    mtY_hap_sex_annot = mtY_hap_sex_annot.annotate_rows(info=info1)
     print("Checkpoint chrY")
     mtY_hap_sex_annot= mtY_hap_sex_annot.checkpoint(f"{tmp_dir}/intervalwgs/chrY_haploid_final.mt", overwrite=True)
     print("Export chrY VCF")
