@@ -67,7 +67,7 @@ if __name__ == "__main__":
     #after having merged chromosomes and done new sample and variant qc with merge_matrixtables_FINAL.py
 
     CHROMOSOME="WGS-autosomes"
-    mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-FILTERED.mt")
+    mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
     
     
 
