@@ -35,11 +35,8 @@ with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
 def import_vcf(vcf_path,partitions):
-    mt = hl.import_vcf(vcf_path,
-                            force_bgz=True,
-                            reference_genome='GRCh38',
-                            array_elements_required=False,
-                            min_partitions=partitions)
+    mt = hl.import_vcf(vcf_path, array_elements_required=False, min_partitions=partitions,
+                       force_bgz=True, header_file= storage["intervalwgs"]["s3"]["chrX_header"])
 
     if mt.n_partitions() > partitions:
         mt = mt.naive_coalesce(partitions)
