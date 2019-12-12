@@ -219,9 +219,9 @@ if __name__ == "__main__":
     # wes_autosomes=wes.filter_rows((wes.locus.contig == 'chrX') & (wes.locus.contig == 'chrY'), keep=False )
     # #multi split wes:
     wes_autosomes=hl.split_multi_hts(wes_autosomes, keep_star=False)
-    wes_autosomes.checkpoint(f"{tmp_dir}/intervalwes/wes_chrXY_surgery_FINAL_SPLIT.mt", overwrite=True)
-    #fields_to_drop = ['PGT', 'PID','PS']
-    #wes_autosomes=wes_autosomes.drop(*fields_to_drop)
+    wes_autosomes=wes_autosomes.checkpoint(f"{tmp_dir}/intervalwes/wes_surgery_FINAL_SPLIT.mt", overwrite=True)
+    fields_to_drop = ['PGT', 'PID','PS']
+    wes_autosomes=wes_autosomes.drop(*fields_to_drop)
     # #join with wes
     # wes_autosomes=wes.filter_rows((wes.locus.contig == 'chrX') & (wes.locus.contig == 'chrY'), keep=False )
     wes_new=wes_autosomes.union_rows(XYfinal)
