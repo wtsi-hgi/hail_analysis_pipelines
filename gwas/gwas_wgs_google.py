@@ -78,38 +78,33 @@ if __name__ == "__main__":
     ph1=list(mt.phenotype)
     for pheno in ph1:
         if pheno.startswith('somalogic'):
-            somalogic_proteomics.append(pheno)
+            somalogic_proteomics.append(mt.phenotype[pheno])
         elif pheno.startswith('nmr'):
-            nmr.append(pheno)
+            nmr.append(mt.phenotype[pheno])
         elif pheno.startswith('olink'):
-            olink_proteomics.append(pheno)
+            olink_proteomics.append(mt.phenotype[pheno])
         elif pheno.startswith('fbc'):
-            fbc.append(pheno)
+            fbc.append(mt.phenotype[pheno])
         elif pheno.startswith('PC'):
-            pcas.append(pheno)
+            pcas.append(mt.phenotype[pheno])
+        
     
-    nmr1=mt.phenotype.select(*nmr)
-    fbc1=mt.phenotype.select(*fbc)
-    op=mt.phenotype.select(*olink_proteomics)
-    sp=mt.phenotype.select(*somalogic_proteomics)
-    pcas1=mt.phenotype.select(*pcas)
-    phens=[mt.phenotype[i] for i in range(10,210)]
 
     print("Linear regression")
     #y=[nmr1[0],fbc1[0], op[0],sp[0]],
     #y=[nmr1[0],fbc1[0], op[0],sp[0]],
     # TIM NOTE: I changed the below to show how linear_regression_rows can process groups of phenotypes in a vectorized way
     gwas = hl.linear_regression_rows(
-        y=phens,
-        x=mt.GT.n_alt_alleles(), covariates=[1.0, pcas1[0:10][0]], pass_through=[mt.rsid])
+        y=[nmr],
+        x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas, pass_through=[mt.rsid])
 
     # gwas = hl.linear_regression_rows(y=[[mt_filtered.sample_qc_and_phenotype.wbc_gwas_normalised, ...], [family2...]],
     print("Linear regression CHECKPOINT")
     # TIM NOTE: checkpoint here to prevent multiple execution (write to a file, read that file)
-    gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint", overwrite=True)
+    gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-nmr", overwrite=True)
     # gwas = gwas.checkpoint(s3"{tmp_dir}/gwas_wbc_chr19_checkpoint.mt")
     print("Linear regression output table")
-    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export.tsv.bgz", header=True)
+    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-nmr.tsv.bgz", header=True)
 
     print("Plotting")
 
