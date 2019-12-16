@@ -69,8 +69,9 @@ if __name__ == "__main__":
     CHROMOSOME="WGS-autosomes"
     mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
     
+    print("Number of initial variants:")
+    print(mt.count())
     
-
     print("Annotating matrixtable with fbc:")
     mt = mt.annotate_cols(phenotype=ja[mt.s])
 
@@ -103,8 +104,13 @@ if __name__ == "__main__":
     # TIM NOTE: checkpoint here to prevent multiple execution (write to a file, read that file)
     gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-somalogic", overwrite=True)
     # gwas = gwas.checkpoint(s3"{tmp_dir}/gwas_wbc_chr19_checkpoint.mt")
+    print("Number of variants in gwas table:")
+    print("gwas.count()")
+    gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 0.05), keep=True)
+    print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.05")
+    print("gwas1.count()")
     print("Linear regression output table")
-    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-somalogic.tsv.bgz", header=True)
+    #gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-somalogic.tsv.bgz", header=True)
 
     print("Plotting")
 
