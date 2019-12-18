@@ -13,7 +13,7 @@ import sys
 
 
 
-project_root = os.path.dirname(os.path.dirname(__file__))
+project_root=Path(__file__).parent.parent.parent
 print(project_root)
 
 s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
