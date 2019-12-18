@@ -45,6 +45,7 @@ olink_proteomics=[]
 somalogic_proteomics=[]
 fbc=[]
 pcas=[]
+nmr2=[]
 
 
 
@@ -82,6 +83,7 @@ if __name__ == "__main__":
             somalogic_proteomics.append(mt.phenotype[pheno])
         elif pheno.startswith('nmr'):
             nmr.append(mt.phenotype[pheno])
+            nmr2.append(pheno)
         elif pheno.startswith('olink'):
             olink_proteomics.append(mt.phenotype[pheno])
         elif pheno.startswith('fbc'):
@@ -103,8 +105,8 @@ if __name__ == "__main__":
     print("Linear regression CHECKPOINT")
     # TIM NOTE: checkpoint here to prevent multiple execution (write to a file, read that file)
     gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-nmr", overwrite=True)
-    gwas=gwas.annotate(nmr_phenotypes=nmr)
-    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-somalogic_p_value_0.05.tsv.bgz", header=True)
+    gwas=gwas.annotate(nmr_phenotypes=nmr2)
+    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-nmr.tsv.bgz", header=True)
 
     # gwas = gwas.checkpoint(s3"{tmp_dir}/gwas_wbc_chr19_checkpoint.mt")
     print("Number of variants in gwas table:")
