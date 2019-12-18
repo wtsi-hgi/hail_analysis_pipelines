@@ -67,7 +67,7 @@ if __name__ == "__main__":
     #####################################################################
     #DEFINE INPUT FILE PATHS
 
-    gwas1=hl.read_table(f"{tmp_dir}/intervalwgs/{WGS-autosomes-gwasfbc-checkpoint-somalogic_0.05_partitioned")
+    gwas1=hl.read_table(f"{tmp_dir}/intervalwgs/WGS-autosomes-gwasfbc-checkpoint-somalogic_0.05_partitioned")
 
 
     gwas_table=gwas1.flatten()
