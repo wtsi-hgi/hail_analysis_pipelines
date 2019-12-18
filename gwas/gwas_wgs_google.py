@@ -96,28 +96,30 @@ if __name__ == "__main__":
     #y=[nmr1[0],fbc1[0], op[0],sp[0]],
     # TIM NOTE: I changed the below to show how linear_regression_rows can process groups of phenotypes in a vectorized way
     gwas = hl.linear_regression_rows(
-        y=[somalogic_proteomics],
+        y=[nmr],
         x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas, pass_through=[mt.rsid])
 
     # gwas = hl.linear_regression_rows(y=[[mt_filtered.sample_qc_and_phenotype.wbc_gwas_normalised, ...], [family2...]],
     print("Linear regression CHECKPOINT")
     # TIM NOTE: checkpoint here to prevent multiple execution (write to a file, read that file)
-    gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-somalogic", overwrite=True)
+    gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-nmr", overwrite=True)
+    gwas=gwas.annotate(nmr_phenotypes=nmr)
+    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-somalogic_p_value_0.05.tsv.bgz", header=True)
+
     # gwas = gwas.checkpoint(s3"{tmp_dir}/gwas_wbc_chr19_checkpoint.mt")
     print("Number of variants in gwas table:")
     print("gwas.count()")
-    gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 0.05), keep=True)
-    gwas2=gwas.filter(gwas.p_value[0].any(lambda x: x < 0.04), keep=True)
-    gwas3=gwas.filter(gwas.p_value[0].any(lambda x: x < 0.03), keep=True)
-    gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-somalogic_0.05", overwrite=True)
-    print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.05")
-    print(gwas1.count())
-    print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.04")
-    print(gwas2.count())
-    print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.03")
-    print(gwas3.count())
-    print("Linear regression output table")
-    gwas1.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-somalogic_p_value_0.05.tsv.bgz", header=True)
+    #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 0.05), keep=True)
+    
+    #gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-", overwrite=True)
+    #print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.05")
+    #print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.04")
+    #print(gwas2.count())
+    ##print(gwas1.count())
+    #print("Number of varians after filtering by keeing only variants that have any phenotype with p-value less than < 0.03")
+    #print(gwas3.count())
+    #print("Linear regression output table")
+    #gwas1.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-somalogic_p_value_0.05.tsv.bgz", header=True)
 
     print("Plotting")
 
