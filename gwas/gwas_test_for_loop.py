@@ -80,8 +80,8 @@ if __name__ == "__main__":
             y=value,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
         
-        gwas1=gwas.filter(gwas.p_value.any(lambda x: x < 5e-8 ), keep=True)
-        
+        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
+        gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
         gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
         print(gwas1.count())
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
