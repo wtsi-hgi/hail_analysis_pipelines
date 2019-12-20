@@ -17,25 +17,6 @@ BUCKET = "gs://interval-wgs"
 tmp_dir="/Users/pa10/Programming/google-code/google/tmp"
 
 
-project_root=Path(__file__).parent.parent.parent
-print(project_root)
-
-s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
-print(s3credentials)
-
-storage = os.path.join(project_root , "config_files/storage.json")
-
-thresholds = os.path.join(project_root, "config_files/thresholds.json")
-
-with open(f"{s3credentials}", 'r') as f:
-    credentials = json.load(f)
-
-with open(f"{storage}", 'r') as f:
-    storage = json.load(f)
-
-with open(f"{thresholds}", 'r') as f:
-    thresholds = json.load(f)
-
 
 nmr=[]
 metabolon_metabolomics=[]
