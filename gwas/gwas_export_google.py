@@ -104,7 +104,7 @@ if __name__ == "__main__":
     # gwas = hl.linear_regression_rows(y=[[mt_filtered.sample_qc_and_phenotype.wbc_gwas_normalised, ...], [family2...]],
     print("Linear regression CHECKPOINT")
     # TIM NOTE: checkpoint here to prevent multiple execution (write to a file, read that file)
-    gwas = hl.read_matrix_table(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-nmr")
+    gwas = hl.read_table(f"{BUCKET}/gwas/{CHROMOSOME}-gwasfbc-checkpoint-nmr")
     gwas=gwas.annotate(nmr_phenotypes=nmr2)
     gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-nmr.tsv.bgz", header=True)
 
