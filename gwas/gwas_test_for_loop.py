@@ -79,7 +79,12 @@ if __name__ == "__main__":
         gwas = hl.linear_regression_rows(
             y=value,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:3], pass_through=[mt.rsid])
-        gwas = gwas.checkpoint(f"{BUCKET}/gwas/gwas{index}-test.table", overwrite=True)
-        gwas.export(f"{BUCKET}/gwas/gwas-{index}_test_loop.tsv.bgz", header=True)
+        
+        gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
+        
+        gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
+        print(gwas1.count())
+        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
+        gwas1.export(f"{BUCKET}/gwas/gwas-{index}_test_loop_pvalue5e-8.tsv.bgz", header=True)
 
     print("Done")
