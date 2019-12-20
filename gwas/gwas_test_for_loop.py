@@ -79,7 +79,7 @@ if __name__ == "__main__":
         gwas = hl.linear_regression_rows(
             y=value,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:3], pass_through=[mt.rsid])
-        gwas = gwas.checkpoint(f"{BUCKET}/gwas/gwas{i}-test.table", overwrite=True)
-        gwas.export(f"{BUCKET}/gwas/gwas-{i}_test_loop.tsv.bgz", header=True)
+        gwas = gwas.checkpoint(f"{BUCKET}/gwas/gwas{index}-test.table", overwrite=True)
+        gwas.export(f"{BUCKET}/gwas/gwas-{index}_test_loop.tsv.bgz", header=True)
 
     print("Done")
