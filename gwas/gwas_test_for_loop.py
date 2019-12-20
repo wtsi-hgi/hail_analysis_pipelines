@@ -78,7 +78,7 @@ if __name__ == "__main__":
         print(nmr2[index])
         gwas = hl.linear_regression_rows(
             y=value,
-            x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:3], pass_through=[mt.rsid])
+            x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
         
         gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
         
