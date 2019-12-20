@@ -28,17 +28,9 @@ nmr2=[]
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
-    sc = pyspark.SparkContext()
     #Define the hail persistent storage directory
-    tmp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
-    #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
-    # you may use your own here from your .s3fg file in your home directory
-    hadoop_config = sc._jsc.hadoopConfiguration()
+    hl.init(default_reference="GRCh38", tmp_dir=tmp_dir)
 
-    hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
-    hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
-    
     phenotypes = hl.import_table("gs://interval-wgs/gwas/phenotypes_pc_fbc_nmr_olink_somalogic_09-12-1019.csv", impute=True, delimiter=',')
 
     sample_QC_nonHail = hl.import_table("gs://interval-wgs/qc-files/INTERVAL_WGS_Sample_QC_04-09-2019.txt", impute=True)
@@ -47,6 +39,9 @@ if __name__ == "__main__":
 
     print('Joining annotations')
     ja=phenotypes.key_by('ID')
+
+
+
 
     
 
