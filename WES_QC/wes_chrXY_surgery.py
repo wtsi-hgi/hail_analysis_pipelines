@@ -4,16 +4,18 @@ author: Pavlos Antoniou
 date: 22/07/19
 '''
 
-import os
+mport os
 import hail as hl
 import pyspark
 import json
 import sys
+from pathlib import Path
 
 
 
 
-project_root = os.path.dirname(os.path.dirname(__file__))
+
+project_root=Path(__file__).parent.parent.parent
 print(project_root)
 
 s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
@@ -31,6 +33,8 @@ with open(f"{storage}", 'r') as f:
 
 with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
+
+
 
 def import_vcf(vcf_path,partitions):
     mt = hl.import_vcf(vcf_path,

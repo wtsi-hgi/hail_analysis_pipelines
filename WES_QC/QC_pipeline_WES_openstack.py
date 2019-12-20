@@ -9,10 +9,14 @@ import os
 import hail as hl
 import pyspark
 import json
+import sys
+from pathlib import Path
 
 
 
-project_root = os.path.dirname(os.path.dirname(__file__))
+
+
+project_root=Path(__file__).parent.parent.parent
 print(project_root)
 
 s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
@@ -30,6 +34,7 @@ with open(f"{storage}", 'r') as f:
 
 with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
+
 
 
 if __name__ == "__main__":

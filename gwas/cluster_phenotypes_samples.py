@@ -1,7 +1,7 @@
-
 '''
-author: Pavlos Antoniou
-date: 22/07/19
+The phenotypes are grouped into clusters. 
+Phenotypes are grouped together to have the same number of samples having no missing values.
+
 '''
 
 import os
@@ -10,7 +10,7 @@ import pyspark
 import json
 import sys
 from pathlib import Path
-
+import pandas as pd 
 
 
 
@@ -34,8 +34,6 @@ with open(f"{storage}", 'r') as f:
 with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
-
-
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -48,18 +46,4 @@ if __name__ == "__main__":
 
     hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
-    
-    
-    sample_QC_nonHail = hl.import_table(storage["intervalwgs"]["s3"]["sampleQC_non_hail"], impute=True)
 
-    #####################################################################
-    ###################### chromosome X  ##############################
-    #####################################################################
-    #DEFINE INPUT FILE PATHS
-
-    gwas1=hl.read_table(f"{tmp_dir}/intervalwgs/WGS-autosomes-gwasfbc-checkpoint-somalogic_0.05_partitioned")
-
-
-    gwas_table=gwas1.flatten()
-
-    gwas_table.export(f"{tmp_dir}/intervalwgs/gwas-wgsautosomes-export-somalogic_p_value_0.05.tsv.bgz", header=True)
