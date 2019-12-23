@@ -72,7 +72,7 @@ if __name__ == "__main__":
             pcas.append(mt.phenotype[pheno])
         
     nmr_dict={}
-    for index,value in enumerate(nmr[0:100]):
+    for index,value in enumerate(nmr):
         #print(index)
         #print(value)
         #print(nmr2[index])
@@ -103,18 +103,18 @@ if __name__ == "__main__":
    # print(str(key) + '=>'+ str(value) + '=>' + str(len(value)))
         print( str(value) + '=>' + str(len(value)))
 
-    print("Linear regression")
-    for index,value in enumerate(nmr[0:10]):
-        print(nmr2[index])
-        gwas = hl.linear_regression_rows(
-            y=value,
-            x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
+    #print("Linear regression")
+    #for index,value in enumerate(nmr[0:10]):
+    #    print(nmr2[index])
+    #    gwas = hl.linear_regression_rows(
+    #        y=value,
+    #        x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
         
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
-        gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
-        print(gwas1.count())
+     #   gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
+     #   gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
+     #   print(gwas1.count())
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        gwas1.export(f"{BUCKET}/gwas/gwas-{index}_test_loop_pvalue5e-8.tsv.bgz", header=True)
+     #   gwas1.export(f"{BUCKET}/gwas/gwas-{index}_test_loop_pvalue5e-8.tsv.bgz", header=True)
 
     print("Done")
