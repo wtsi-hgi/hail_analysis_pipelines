@@ -25,15 +25,17 @@ somalogic_proteomics=[]
 fbc=[]
 pcas=[]
 nmr2=[]
+somalogic2=[]
+olink2=[]
+fbc2=[]
 
-
-def print_clusters(phenotype_group):
+def print_clusters(phenotype_group, phenotype_name):
     print("**************************************************")
     nmr_dict={}
     for index,value in enumerate(phenotype_group):
         list1=value.collect()
         list2=[0 if v is None else 1 for v in list1]
-        nmr_dict[nmr2[index]]=list2
+        nmr_dict[phenotype_name[index]]=list2
 
     dict1={}
     namelist=[]
@@ -89,19 +91,23 @@ if __name__ == "__main__":
     for pheno in ph1:
         if pheno.startswith('somalogic'):
             somalogic_proteomics.append(mt.phenotype[pheno])
+            somalogic2.append(pheno)
         elif pheno.startswith('nmr'):
             nmr.append(mt.phenotype[pheno])
             nmr2.append(pheno)
         elif pheno.startswith('olink'):
             olink_proteomics.append(mt.phenotype[pheno])
+            olink2.append(pheno)
         elif pheno.startswith('fbc'):
             fbc.append(mt.phenotype[pheno])
+            fbc2.append(pheno)
         elif pheno.startswith('PC'):
             pcas.append(mt.phenotype[pheno])
         
 
     all_groups=[nmr,somalogic_proteomics,olink_proteomics,fbc]
-    for group in all_groups:
-        print_clusters(group)
+    all_names=[nmr2,somalogic2,olink2,fbc2]
+    for group,name in zip(all_groups,all_names):
+        print_clusters(group,name)
        
     print("Done")
