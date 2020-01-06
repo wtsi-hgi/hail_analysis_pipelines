@@ -44,7 +44,6 @@ def print_clusters(phenotype_group):
         if tuple1 in dict1:
             # append the new number to the existing array at this slot
             dict1[tuple1].append(name)
-            print("appended")
         else:
             # create a new array in this slot
             dict1[tuple1] = [name]
@@ -100,7 +99,7 @@ if __name__ == "__main__":
         elif pheno.startswith('PC'):
             pcas.append(mt.phenotype[pheno])
         
-    nmr_dict={}
+
     all_groups=[nmr,somalogic_proteomics,olink_proteomics,fbc]
     for group in all_groups:
         print_clusters(group)
