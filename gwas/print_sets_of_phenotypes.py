@@ -105,8 +105,11 @@ if __name__ == "__main__":
             pcas.append(mt.phenotype[pheno])
         
 
-    all_groups=[nmr,somalogic_proteomics,olink_proteomics,fbc]
-    all_names=[nmr2,somalogic2,olink2,fbc2]
+    #all_groups=[nmr,somalogic_proteomics,olink_proteomics,fbc]
+    #all_names=[nmr2,somalogic2,olink2,fbc2]
+
+    all_groups=[olink_proteomics,fbc]
+    all_names=[olink2,fbc2]
     for group,name in zip(all_groups,all_names):
         print_clusters(group,name)
        
