@@ -106,7 +106,21 @@ if __name__ == "__main__":
     _max = max(map(len,dict1.values()))
     nmr_new=[]
     nmr2_new=[]
+    new_result = dict(i for i in enumerate(dict1.values()) if len(i[-1]) == _max)
+    ph1=list(mt.phenotype)
+    for pheno in ph1:
+        if pheno.startswith('nmr'):
+            if pheno in str(new_result.values()):
+                nmr_new.append(mt.phenotype[pheno])
+                nmr2_new.append(pheno)
     
+    gwas = hl.linear_regression_rows(
+    y=[nmr_new],
+    x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
+    gwas = gwas.checkpoint(f"{BUCKET}/gwas/{CHROMOSOME}-gwas-checkpoint-nmr-test-cluster", overwrite=True)
+    gwas=gwas.annotate(nmr_phenotypes=nmr2_new)
+    gwas.export(f"{BUCKET}/gwas/gwas-{CHROMOSOME}-export-nmr-cluster.tsv.bgz", header=True)
+
     #print("Linear regression")
     #for index,value in enumerate(nmr[0:10]):
     #    print(nmr2[index])
