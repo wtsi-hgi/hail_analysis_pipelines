@@ -28,6 +28,7 @@ nmr2=[]
 
 
 def print_clusters(phenotype_group):
+    print("**************************************************")
     nmr_dict={}
     for index,value in enumerate(phenotype_group):
         list1=value.collect()
@@ -52,7 +53,7 @@ def print_clusters(phenotype_group):
    # print(str(key) + '=>'+ str(value) + '=>' + str(len(value)))
         print( str(value) + '=>' + str(len(value)))
 
-
+    print("**************************************************")
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
@@ -100,51 +101,8 @@ if __name__ == "__main__":
             pcas.append(mt.phenotype[pheno])
         
     nmr_dict={}
-    all_groups=[nmr,]
-    for index,value in enumerate(nmr):
-        #print(index)
-        #print(value)
-        #print(nmr2[index])
-        list1=value.collect()
-        list2=[0 if v is None else 1 for v in list1]
-        #nmr_lists.append(list2)
-        nmr_dict[nmr2[index]]=list2
-
-    #print(nmr_lists)
-    dict1={}
-    namelist=[]
-    for name, measurements in nmr_dict.items():
-        
-        #print(name, '->', measurements)
-        tuple1=tuple(measurements)
-        #print(len(tuple1))
-        #print(tuple1)
-    # print(key)
-        if tuple1 in dict1:
-            # append the new number to the existing array at this slot
-            dict1[tuple1].append(name)
-            print("appended")
-        else:
-            # create a new array in this slot
-            dict1[tuple1] = [name]
-
-    for key,value in dict1.items():
-   # print(str(key) + '=>'+ str(value) + '=>' + str(len(value)))
-        print( str(value) + '=>' + str(len(value)))
-
-    
-    #print("Linear regression")
-    #for index,value in enumerate(nmr[0:10]):
-    #    print(nmr2[index])
-    #    gwas = hl.linear_regression_rows(
-    #        y=value,
-    #        x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
-        
-        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-     #   gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
-     #   gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
-     #   print(gwas1.count())
-        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-     #   gwas1.export(f"{BUCKET}/gwas/gwas-{index}_test_loop_pvalue5e-8.tsv.bgz", header=True)
-
+    all_groups=[nmr,somalogic_proteomics,olink_proteomics,fbc]
+    for group in all_groups:
+        print_clusters(group)
+       
     print("Done")
