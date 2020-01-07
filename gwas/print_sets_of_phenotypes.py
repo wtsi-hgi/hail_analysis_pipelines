@@ -32,6 +32,8 @@ fbc2=[]
 def print_clusters(phenotype_group, phenotype_name):
     print("**************************************************")
     nmr_dict={}
+    #Create a dictionary with values a list of 1 if measurement in sample, 0 if not. 
+    #key is the phenotype
     for index,value in enumerate(phenotype_group):
         list1=value.collect()
         list2=[0 if v is None else 1 for v in list1]
@@ -39,6 +41,10 @@ def print_clusters(phenotype_group, phenotype_name):
 
     dict1={}
     namelist=[]
+    #convert each dictionary values in tuples
+    #if this tuple is already in the dictionary (same samples)
+    #append the phenotype name to the dictionary with key the tuple of measurements
+    #if it's not create a new key-value pair with 
     for name, measurements in nmr_dict.items():
 
         tuple1=tuple(measurements)
@@ -55,6 +61,7 @@ def print_clusters(phenotype_group, phenotype_name):
         print( str(value) + '=>' + str(len(value)))
 
     print("**************************************************")
+
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
