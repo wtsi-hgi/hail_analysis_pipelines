@@ -19,49 +19,47 @@ tmp_dir="/Users/pa10/Programming/google-code/google/tmp"
 
 
 nmr=[]
+sysmex=[]
 metabolon_metabolomics=[]
-olink_proteomics=[]
+olink_inf=[]
+olink_cvd2=[]
+olink_cvd3=[]
+olink_neu=[]
 somalogic_proteomics=[]
 fbc=[]
 pcas=[]
 nmr2=[]
+sysmex2=[]
+olink2_inf=[]
+olink2_cvd2=[]
+olink2_cvd3=[]
+olink2_neu=[]
 somalogic2=[]
-olink2=[]
 fbc2=[]
+nmr_samples=11410
+olink_inf_samples=2984
+olink_cvd2_samples=3015
+olink_cvd3_samples=3044
+olink_neu_samples=2859
+somalogic_samples=55
+fbc_samples=11096
+sysmex_samples=11754
 
-def print_clusters(phenotype_group, phenotype_name):
+def print_clusters(phenotype_group, phenotype_name, group_samples):
     print("**************************************************")
     nmr_dict={}
     #Create a dictionary with values a list of 1 if measurement in sample, 0 if not. 
     #key is the phenotype
-    for index,value in enumerate(phenotype_group):
-        list1=value.collect()
-        list2=[0 if v is None else 1 for v in list1]
-        nmr_dict[phenotype_name[index]]=list2
-
-    dict1={}
-    namelist=[]
-    #convert each dictionary values in tuples
-    #if this tuple is already in the dictionary (same samples)
-    #append the phenotype name to the dictionary with key the tuple of measurements
-    #if it's not create a new key-value pair with 
-    for name, measurements in nmr_dict.items():
-
-        tuple1=tuple(measurements)
-
-        if tuple1 in dict1:
-            # append the new number to the existing array at this slot
-            dict1[tuple1].append(name)
-        else:
-            # create a new array in this slot
-            dict1[tuple1] = [name]
-
-    for key,value in dict1.items():
-   # print(str(key) + '=>'+ str(value) + '=>' + str(len(value)))
-        print( str(value) + '=>' + str(len(value)))
-
+    i=1
+    print("id\tPhenotype\tsamples\tTotalsamples\tFraction\tMissingess")
+    for phenotype,name in zip(phenotype_group,phenotype_name):
+        numofsamples=mt.aggregate_cols(hl.agg.count_where(hl.is_defined(phenotype)))
+        fraction=mt.aggregate_cols(hl.agg.fraction(hl.is_defined(phenotype)))
+        missingness=1-fraction
+        print(f'{i}\t{name}\t{numofsamples}\t{group_samples}\t{fraction:.3f}\t{missingness:.3f}')
+        i+=1
+    
     print("**************************************************")
-
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
@@ -102,22 +100,42 @@ if __name__ == "__main__":
         elif pheno.startswith('nmr'):
             nmr.append(mt.phenotype[pheno])
             nmr2.append(pheno)
-        elif pheno.startswith('olink'):
-            olink_proteomics.append(mt.phenotype[pheno])
-            olink2.append(pheno)
+        elif pheno.startswith('sysmex'):
+            sysmex.append(mt.phenotype[pheno])
+            sysmex2.append(pheno)
+        elif pheno.startswith('olinkinf'):
+            olink_inf.append(mt.phenotype[pheno])
+            olink2_inf.append(pheno)
+        elif pheno.startswith('olinkcvd2'):
+            olink_cvd2.append(mt.phenotype[pheno])
+            olink2_cvd2.append(pheno)
+        elif pheno.startswith('olinkcvd3'):
+            olink_cvd3.append(mt.phenotype[pheno])
+            olink2_cvd3.append(pheno)
+        elif pheno.startswith('olinkneu'):
+            olink_neu.append(mt.phenotype[pheno])
+            olink2_neu.append(pheno)
         elif pheno.startswith('fbc'):
             fbc.append(mt.phenotype[pheno])
             fbc2.append(pheno)
         elif pheno.startswith('PC'):
             pcas.append(mt.phenotype[pheno])
+            
+        
         
 
     #all_groups=[nmr,somalogic_proteomics,olink_proteomics,fbc]
     #all_names=[nmr2,somalogic2,olink2,fbc2]
 
-    all_groups=[olink_proteomics,fbc]
-    all_names=[olink2,fbc2]
-    for group,name in zip(all_groups,all_names):
-        print_clusters(group,name)
+    all_groups=[nmr,sysmex,
+    olink_inf,olink_cvd2,olink_cvd3,olink_neu,somalogic_proteomics,fbc]
+
+    all_names=[nmr2,sysmex2,
+    olink2_inf,olink2_cvd2,olink2_cvd3,olink2_neu,somalogic2,fbc2]
+    all_samples=[nmr_samples,sysmex_samples,
+   olink_inf_samples,olink_cvd2_samples,olink_cvd3_samples,
+   olink_neu_samples,somalogic_samples,fbc_samples]
+    for group,name,samples in zip(all_groups,all_names,all_samples):
+        print_clusters(group,name,samples)
        
     print("Done")
