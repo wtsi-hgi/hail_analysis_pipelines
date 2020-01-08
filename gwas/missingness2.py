@@ -131,14 +131,14 @@ if __name__ == "__main__":
     #all_names=[nmr2,somalogic2,olink2,fbc2]
 
     all_groups=[nmr,sysmex,
-    olink_inf,olink_cvd2,olink_cvd3,olink_neu,somalogic_proteomics,fbc]
+    olink_inf,olink_cvd2,olink_cvd3,olink_neu,fbc]
 
     all_names=[nmr2,sysmex2,
-    olink2_inf,olink2_cvd2,olink2_cvd3,olink2_neu,somalogic2,fbc2]
+    olink2_inf,olink2_cvd2,olink2_cvd3,olink2_neu,fbc2]
 
     all_samples=[nmr_samples,sysmex_samples,
    olink_inf_samples,olink_cvd2_samples,olink_cvd3_samples,
-   olink_neu_samples,somalogic_samples,fbc_samples]
+   olink_neu_samples,fbc_samples]
     
     for group,name,samples in zip(all_groups,all_names,all_samples):
         print_clusters(group,name,samples)
