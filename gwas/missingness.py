@@ -54,8 +54,8 @@ def print_clusters(phenotype_group, phenotype_name, group_samples):
     print("id\tPhenotype\tsamples\tTotalsamples\tFraction\tMissingess")
     for phenotype,name in zip(phenotype_group,phenotype_name):
         numofsamples=mt.aggregate_cols(hl.agg.count_where(hl.is_defined(phenotype)))
-        fraction=mt.aggregate_cols(hl.agg.fraction(hl.is_defined(phenotype)))
-        missingness=1-fraction
+        fraction=(int(numofsamples)*100/group_samples)
+        missingness=100-fraction
         print(f'{i}\t{name}\t{numofsamples}\t{group_samples}\t{fraction:.3f}\t{missingness:.3f}')
         i+=1
     
@@ -132,9 +132,11 @@ if __name__ == "__main__":
 
     all_names=[nmr2,sysmex2,
     olink2_inf,olink2_cvd2,olink2_cvd3,olink2_neu,somalogic2,fbc2]
+
     all_samples=[nmr_samples,sysmex_samples,
    olink_inf_samples,olink_cvd2_samples,olink_cvd3_samples,
    olink_neu_samples,somalogic_samples,fbc_samples]
+    
     for group,name,samples in zip(all_groups,all_names,all_samples):
         print_clusters(group,name,samples)
        
