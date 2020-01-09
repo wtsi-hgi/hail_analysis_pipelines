@@ -122,7 +122,7 @@ if __name__ == "__main__":
     mt_sqc1 = mt_vqslod_filtered_WO_centromere.annotate_cols(
         sample_QC_nonHail=sample_QC_nonHail.key_by("ID")[mt_vqslod_filtered_WO_centromere.s])
 
-    ########### Sample QC filtering
+    ########### Sample QC filtering 
     print("Filtering on sample qc")
     mt_sqc1_filtered = mt_sqc1.filter_cols(
         (mt_sqc1.sample_QC_nonHail["PASS.Depth"] == 1) &
@@ -194,7 +194,7 @@ if __name__ == "__main__":
                                  overwrite=True)
 
     ######################
-    ##### VARIANT qc
+    ##### VARIANT qc ONLY FOR MALE SAMPLES
     ######################
     print("Variant qc:")
     mt_sqc_vqc = hl.variant_qc(mt_sqc3, name='variant_QC_Hail')

@@ -55,6 +55,7 @@ def print_clusters(phenotype_group, phenotype_name, group_samples):
     for phenotype,name in zip(phenotype_group,phenotype_name):
         samples=[]
         numofsamples=mt.aggregate_cols(hl.agg.count_where(hl.is_defined(phenotype)))
+        mt2=mt
         mt2=mt.filter_cols(hl.is_defined(phenotype),keep=False)
         samples=mt2.s.collect()
         #print(samples)
