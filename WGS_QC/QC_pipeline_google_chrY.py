@@ -196,15 +196,20 @@ if __name__ == "__main__":
     ######################
     ##### VARIANT qc ONLY FOR MALE SAMPLES
     ######################
-    print("Variant qc:")
-    mt_sqc_vqc = hl.variant_qc(mt_sqc3, name='variant_QC_Hail')
-    mt_sqc_vqc_filtered = mt_sqc_vqc.filter_rows(
-        (mt_sqc_vqc.variant_QC_Hail.call_rate >= 0.95) &
-        (mt_sqc_vqc.variant_QC_Hail.p_value_hwe >= 10 ** -6) &
-        (mt_sqc_vqc.variant_QC_Hail.gq_stats.mean >= 20) &
-        (mt_sqc_vqc.variant_QC_Hail.AC[1] >= 1)
+    print("Variant qc for male samples:")
+    mt=mt_sqc3
+    mtY_males=mt.filter_entries(mt.sex==1,keep=True)
+    mtY_females=mt.filter_entries(mt.sex==1,keep=False)
+    mtY_males=mtY_males.filter_cols(mtY_males.sex==1,keep=True)
+    mtY_females=mt.filter_cols(mt.sex==1,keep=False)
+    mtY_males = hl.variant_qc(mtY_males, name='variant_QC_Hail')
+    mtY_males_filtered = mtY_males.filter_rows(
+        (mtY_males.variant_QC_Hail.call_rate >= 0.95) &
+        (mtY_males.variant_QC_Hail.p_value_hwe >= 10 ** -6) &
+        (mtY_males.variant_QC_Hail.gq_stats.mean >= 20) &
+        (mtY_males.variant_QC_Hail.AC[1] >= 1)
     )
-
+    mt_sqc_vqc_filtered=mtY_males_filtered.union_cols(mtY_females)
     #####################################################################
     ###################### FINAL QC AFTER FILTERING  ####################
     #####################################################################

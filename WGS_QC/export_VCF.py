@@ -65,6 +65,10 @@ if __name__ == "__main__":
     chr20_exon_regions=f"{BUCKET}/exonic-regions/chr20.txt"
     
     mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
+    mt = hl.variant_qc(mt)
+    mt = mt.annotate_rows(info = mt.info.annotate(AC=mt.variant_qc.AC[1]))
+    mt = mt.annotate_rows(info = mt.info.annotate(AF=mt.variant_qc.AF[1]))
+    mt = mt.annotate_rows(info = mt.info.annotate(AN=mt.variant_qc.AN))
     #Export everything but genotype info
     mt1 = mt.select_entries()
     hl.export_vcf(mt1, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.noGT_after_sampleQC.vcf.bgz")
@@ -73,7 +77,7 @@ if __name__ == "__main__":
     mt2=mt.select_entries(mt.GT)
     interval_table = hl.import_locus_intervals(chr20_exon_regions, reference_genome='GRCh38')
     filtered_mt = mt2.filter_rows(hl.is_defined(interval_table[mt2.locus]))
-    hl.export_vcf(filtered_mt, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.GT_only_after_sampleQC.vcf.bgz")
+    hl.export_vcf(filtered_mt, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.GT_only_after_sampleQC_exonic.vcf.bgz")
     #Export everything but genotype info
     mt1 = mt.select_entries()
     #hl.export_vcf(mt, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.noGT_after_sampleQC.vcf.bgz")
