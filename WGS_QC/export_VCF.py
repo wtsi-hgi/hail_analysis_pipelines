@@ -70,7 +70,7 @@ if __name__ == "__main__":
         mt = mt.annotate_rows(info = mt.info.annotate(AN=mt.variant_qc.AN))
         #Export everything but genotype info
         mt1 = mt.select_entries()
-        hl.export_vcf(mt1, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.noGT_after_sampleQC.vcf.bgz")
+        #hl.export_vcf(mt1, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.noGT_after_sampleQC.vcf.bgz")
 
         #Export only Genotype info in exonic regions
         mt2=mt.select_entries(mt.GT)
