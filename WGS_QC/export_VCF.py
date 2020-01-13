@@ -11,7 +11,8 @@ import sys
 import json
 
 
-CHROMOSOMES = ["chr2",
+CHROMOSOMES = ["chr1",
+               "chr2",
                "chr3",
                "chr4",
                "chr5",
