@@ -61,6 +61,7 @@ if __name__ == "__main__":
 
 
     for CHROMOSOME in CHROMOSOMES:
+        print(CHROMOSOME)
         chr_exon_regions=f"{BUCKET}/exonic-regions/{CHROMOSOME}.txt"
     
         mt = hl.read_matrix_table(f"{BUCKET}/matrixtables/{CHROMOSOME}/{CHROMOSOME}-full-sampleqc-variantqc-filtered-FINAL.mt")
