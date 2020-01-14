@@ -38,7 +38,8 @@ if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
     #Define the hail persistent storage directory
-    tmp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
+    tmp_dir = "hdfs://spark-master:9820/"
+    temp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
     hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
     #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
     # you may use your own here from your .s3fg file in your home directory
@@ -65,8 +66,8 @@ if __name__ == "__main__":
     CHROMOSOME = sys.argv[1]
     print(f"Reading {CHROMOSOME} mt")
 
-    #mt = hl.read_matrix_table(f"{storage['intervalwgs']['s3']['repartitioned']}/{CHROMOSOME}.mt")
-    mt = hl.read_matrix_table(f"{tmp_dir}/matrixtables/{CHROMOSOME}.mt")
+    mt = hl.read_matrix_table(f"{storage['intervalwgs']['s3']['matrixtables']}/{CHROMOSOME}.mt")
+    #mt = hl.read_matrix_table(f"{temp_dir}/matrixtables/{CHROMOSOME}.mt")
 
     print("Splitting mt and writing out split mt")
     mt_split = hl.split_multi_hts(mt, keep_star=False, left_aligned = False)
