@@ -52,14 +52,16 @@ if __name__ == "__main__":
     phenotypes=hl.import_table("s3a://ukbb-plink/phenotypes-final.txt", delimiter='\t', types={'disease': hl.tfloat64})
 
     partitions=250
-    vcf=f"{temp_dir}/ukbb-plink/ukbb-plink-rename.vcf.bgz"
-    mt = hl.import_vcf(vcf, force_bgz=True,reference_genome='GRCh38') #, skip_invalid_loci=True)
-    if mt.n_partitions() > partitions:
-        mt = mt.naive_coalesce(partitions)
-    mt= mt.checkpoint(f"{tmp_dir}/ukbb-plink/ukbb-plink.mt", overwrite=True)
-
+    #vcf=f"{temp_dir}/ukbb-plink/ukbb-plink-rename.vcf.bgz"
+    #mt = hl.import_vcf(vcf, force_bgz=True,reference_genome='GRCh38') #, skip_invalid_loci=True)
+    #if mt.n_partitions() > partitions:
+    #    mt = mt.naive_coalesce(partitions)
+    #mt= mt.checkpoint(f"{tmp_dir}/ukbb-plink/ukbb-plink.mt", overwrite=True)
+    mt=hl.read_matrix_table(f"{tmp_dir}/ukbb-plink/ukbb-plink.mt")
     ja=phenotypes.key_by('samplename')
     mt = mt.annotate_cols(phenotype=ja[mt.s])
+    mt= mt.checkpoint(f"{tmp_dir}/ukbb-plink/ukbb-plink_annotated.mt", overwrite=True)
+    print("Run gwas")
     gwas = hl.linear_regression_rows(
         y=mt.phenotype.disease,
         x=mt.GT.n_alt_alleles(), covariates=[1.0], pass_through=[mt.rsid])
