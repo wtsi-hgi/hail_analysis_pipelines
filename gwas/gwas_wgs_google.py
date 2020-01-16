@@ -81,17 +81,30 @@ if __name__ == "__main__":
     for pheno in ph1:
         if pheno.startswith('somalogic'):
             somalogic_proteomics.append(mt.phenotype[pheno])
+            somalogic2.append(pheno)
         elif pheno.startswith('nmr'):
             nmr.append(mt.phenotype[pheno])
             nmr2.append(pheno)
-        elif pheno.startswith('olink'):
-            olink_proteomics.append(mt.phenotype[pheno])
+        elif pheno.startswith('sysmex'):
+            sysmex.append(mt.phenotype[pheno])
+            sysmex2.append(pheno)
+        elif pheno.startswith('olinkinf'):
+            olink_inf.append(mt.phenotype[pheno])
+            olink2_inf.append(pheno)
+        elif pheno.startswith('olinkcvd2'):
+            olink_cvd2.append(mt.phenotype[pheno])
+            olink2_cvd2.append(pheno)
+        elif pheno.startswith('olinkcvd3'):
+            olink_cvd3.append(mt.phenotype[pheno])
+            olink2_cvd3.append(pheno)
+        elif pheno.startswith('olinkneu'):
+            olink_neu.append(mt.phenotype[pheno])
+            olink2_neu.append(pheno)
         elif pheno.startswith('fbc'):
             fbc.append(mt.phenotype[pheno])
+            fbc2.append(pheno)
         elif pheno.startswith('PC'):
             pcas.append(mt.phenotype[pheno])
-        
-    
 
     print("Linear regression")
     #y=[nmr1[0],fbc1[0], op[0],sp[0]],

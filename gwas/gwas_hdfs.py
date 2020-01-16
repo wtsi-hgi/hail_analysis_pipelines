@@ -32,7 +32,9 @@ with open(f"{storage}", 'r') as f:
 with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
-
+phenotypes = hl.import_table("gs://interval-wgs/gwas/phenotypes_pc_fbc_nmr_olink_somalogic_09-12-1019.csv", impute=True, delimiter=',')
+dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',
+                          skip_invalid_loci=True)
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -46,3 +48,60 @@ if __name__ == "__main__":
 
     hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
+     
+    CHROMOSOME="WGS-autosomes"
+    mt = hl.read_matrix_table(f"{temp_dir}/matrixtables/WGS_autosomes-full-sampleqc-variantqc-FILTERED.mt")
+    
+    print("Number of initial variants:")
+    print(mt.count())
+    
+    print("Annotating matrixtable with fbc:")
+    mt = mt.annotate_cols(phenotype=ja[mt.s])
+
+    print("Grouping the phenotypes into lists:")
+    ph1=list(mt.phenotype)
+    for pheno in ph1:
+        if pheno.startswith('somalogic'):
+            somalogic_proteomics.append(mt.phenotype[pheno])
+            somalogic2.append(pheno)
+        elif pheno.startswith('nmr'):
+            nmr.append(mt.phenotype[pheno])
+            nmr2.append(pheno)
+        elif pheno.startswith('sysmex'):
+            sysmex.append(mt.phenotype[pheno])
+            sysmex2.append(pheno)
+        elif pheno.startswith('olinkinf'):
+            olink_inf.append(mt.phenotype[pheno])
+            olink2_inf.append(pheno)
+        elif pheno.startswith('olinkcvd2'):
+            olink_cvd2.append(mt.phenotype[pheno])
+            olink2_cvd2.append(pheno)
+        elif pheno.startswith('olinkcvd3'):
+            olink_cvd3.append(mt.phenotype[pheno])
+            olink2_cvd3.append(pheno)
+        elif pheno.startswith('olinkneu'):
+            olink_neu.append(mt.phenotype[pheno])
+            olink2_neu.append(pheno)
+        elif pheno.startswith('fbc'):
+            fbc.append(mt.phenotype[pheno])
+            fbc2.append(pheno)
+        elif pheno.startswith('PC'):
+            pcas.append(mt.phenotype[pheno])
+
+
+    print("Linear regression")
+    for index,value in enumerate(nmr[0:10]):
+        print(nmr2[index])
+        gwas = hl.linear_regression_rows(
+            y=value,
+            x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
+
+        gwas_annotated = gwas_table.annotate(dbsnp=dbsnp_rows[gwas_table.locus, gwas_table.alleles].rsid)
+        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
+        gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
+       
+        gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
+        print(gwas1.count())
+        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
+        gwas1.export(f"{BUCKET}/gwas/gwas-{index}_test_loop_pvalue5e-8.tsv.bgz", header=True)
+        
