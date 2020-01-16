@@ -52,8 +52,8 @@ if __name__ == "__main__":
     phenotypes=hl.import_table("s3a://ukbb-plink/phenotypes-final.txt", delimiter='\t', types={'disease': hl.tfloat64})
 
     partitions=250
-    vcf="s3a://ukbb-plink/ukbb-plink.vcf.bgz"
-    mt = hl.import_vcf(vcf, force_bgz=True,reference_genome='GRCh37') #, skip_invalid_loci=True)
+    vcf="s3a://ukbb-plink/ukbb-plink-rename.vcf.bgz"
+    mt = hl.import_vcf(vcf, force_bgz=True,reference_genome='GRCh38') #, skip_invalid_loci=True)
     if mt.n_partitions() > partitions:
         mt = mt.naive_coalesce(partitions)
     mt= mt.checkpoint(f"{tmp_dir}/ukbb-plink/ukbb-plink.mt", overwrite=True)
