@@ -2,7 +2,7 @@
 '''
 QC for 1 chromosome
 author: Pavlos Antoniou
-date: 22/07/19
+date: 10/01/2020
 '''
 
 import os
