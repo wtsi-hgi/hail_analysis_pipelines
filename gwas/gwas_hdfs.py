@@ -32,7 +32,7 @@ with open(f"{storage}", 'r') as f:
 with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
-phenotypes = hl.import_table("gs://interval-wgs/gwas/phenotypes_pc_fbc_nmr_olink_somalogic_09-12-1019.csv", impute=True, delimiter=',')
+phenotypes = hl.import_table("s3a://intervalwgs-qc/phenotypes_pc_fbc_nmr_olink_somalogic_16-12-1019.csv", impute=True, delimiter=',')
 dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',
                           skip_invalid_loci=True)
 if __name__ == "__main__":
@@ -92,6 +92,7 @@ if __name__ == "__main__":
     print("Linear regression")
     for index,value in enumerate(nmr[0:10]):
         print(nmr2[index])
+        pheno_name=nmr2[index]
         gwas = hl.linear_regression_rows(
             y=value,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
@@ -100,8 +101,16 @@ if __name__ == "__main__":
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
         gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
        
-        gwas1 = gwas1.checkpoint(f"{BUCKET}/gwas/gwas{index}-test_pvalue5e-8.table", overwrite=True)
+        gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-test_pvalue5e-8.table", overwrite=True)
         print(gwas1.count())
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        gwas1.export(f"{BUCKET}/gwas/gwas-{index}_test_loop_pvalue5e-8.tsv.bgz", header=True)
+        gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", header=True)
         
+        gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
+                                 types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
+
+        dbsnp_rows = dbsnp.rows()
+        gwas_annotated = gwas_table.annotate(dbsnp=dbsnp_rows[gwas_table.locus, gwas_table.alleles].rsid)
+
+    print("export table")
+    gwas_annotated.export(f"{BUCKET}/gwas/gwas_WGS_with_rsID_not_parallel.tsv.bgz", delimiter="\t",header=True)

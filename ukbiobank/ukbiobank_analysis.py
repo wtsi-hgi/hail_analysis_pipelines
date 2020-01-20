@@ -61,18 +61,21 @@ if __name__ == "__main__":
     ja=phenotypes.key_by('samplename')
     mt = mt.annotate_cols(phenotype=ja[mt.s])
     mt= mt.checkpoint(f"{tmp_dir}/ukbb-plink/ukbb-plink_annotated.mt", overwrite=True)
+    
     print("Run gwas")
     gwas = hl.linear_regression_rows(
         y=mt.phenotype.disease,
         x=mt.GT.n_alt_alleles(), covariates=[1.0], pass_through=[mt.rsid])
     gwas = gwas.checkpoint(f"{tmp_dir}/ukbb-plink/gwas/ukbb-plink-checkpoint", overwrite=True)
+    gwas.export(f"{tmp_dir}/ukbb-plink/gwas/ukbb-plink-export.tsv.bgz", header=True)
 
 
-    print(f"Plotting ")
+    print("Plotting ")
+    
     p = hl.plot.manhattan(gwas.p_value, title="UKBB plink Manhattan plot")
-    output_file(f"{tmp_dir}/ukbb-plink/gwas/plots/UKBB-manhattan.html")
+    output_file(f"{temp_dir}/UKBB-manhattan.html")
     save(p)
         #hl.hadoop_copy(f"{i}.WGS-manhattan-{covariates[i]}.html", f"{BUCKET}/gwas/plots/")
     p = hl.plot.qq(gwas.p_value, title="UKBB plink QQ plot")
-    output_file(f"{tmp_dir}/ukbb-plink/gwas/plots/UKBB-QQplot.html")
+    output_file(f"{temp_dir}/UKBB-QQplot.html")
     save(p)
