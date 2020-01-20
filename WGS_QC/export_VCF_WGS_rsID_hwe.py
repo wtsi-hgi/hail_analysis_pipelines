@@ -57,11 +57,12 @@ if __name__ == "__main__":
     hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
     
-    dbsp_vcf=storage["intervalwgs"]["s3"]["dbsnpv53"]
-    mt_wgs=hl.read_matrix_table((f"{temp_dir}/intervalwgs/WGS_after_surgery-full-sampleqc-variantqc-FILTERED.mt")
-    dbsnp = hl.import_vcf(dbsnp_vcf, force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
+    mt_wgs=hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_after_surgery-full-sampleqc-variantqc-FILTERED.mt")
+   
+    dbsnp_vcf= "s3a://intervalwgs-qc/dbsnp_153.hg38.vcf.gz"
+    dbsnp = hl.import_vcf(dbsnp_vcf, force_bgz=True, reference_genome='GRCh38',
+                          skip_invalid_loci=True)
     dbsnp_rows = dbsnp.rows()
-    
     for CHROMOSOME in CHROMOSOMES:
         print(CHROMOSOME)
        
