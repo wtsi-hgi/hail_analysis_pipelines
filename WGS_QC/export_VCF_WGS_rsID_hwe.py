@@ -59,8 +59,7 @@ if __name__ == "__main__":
     
     dbsp_vcf=storage["intervalwgs"]["s3"]["dbsnpv53"]
     mt_wgs=hl.read_matrix_table((f"{temp_dir}/intervalwgs/WGS_after_surgery-full-sampleqc-variantqc-FILTERED.mt")
-    dbsnp = hl.import_vcf(dbsnp_vcf, force_bgz=True, reference_genome='GRCh38',
-                          skip_invalid_loci=True)
+    dbsnp = hl.import_vcf(dbsnp_vcf, force_bgz=True, reference_genome='GRCh38', skip_invalid_loci=True)
     dbsnp_rows = dbsnp.rows()
     
     for CHROMOSOME in CHROMOSOMES:
