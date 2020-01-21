@@ -34,11 +34,11 @@ with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
 CHROMOSOMES= [
-               "chr1",
-               "chr2",
-               "chr3",
-               "chr4",
-               "chr5",
+              # "chr1",
+              # "chr2",
+              # "chr3",
+              # "chr4",
+              # "chr5",
                "chr6",
                "chr7",
                "chr8",
@@ -94,13 +94,13 @@ if __name__ == "__main__":
         mt=mt.annotate_rows(rsid=dbsnp_rows[mt.locus, mt.alleles].rsid)
         #Export everything 
         #mt1 = mt.select_entries()
-        hl.export_vcf(mt, f"{tmp_dir}/VCFs/{CHROMOSOME}/{CHROMOSOME}.intervalwgs_v1_all_info.vcf.bgz")
+        hl.export_vcf(mt, f"{tmp_dir}/VCFs/{CHROMOSOME}/{CHROMOSOME}.intervalwgs_v1_all_info.vcf.bgz", parallel="separate_header")
 
         #Export only Genotype info in exonic regions
         mt2=mt.select_entries(mt.GT)
         #interval_table = hl.import_locus_intervals(chr_exon_regions, reference_genome='GRCh38')
         #filtered_mt = mt2.filter_rows(hl.is_defined(interval_table[mt2.locus]))
-        hl.export_vcf(mt2, f"{tmp_dir}/VCFs/{CHROMOSOME}/{CHROMOSOME}.intervalwgs_v2_GT_only.vcf.bgz")
+        hl.export_vcf(mt2, f"{tmp_dir}/VCFs/{CHROMOSOME}/{CHROMOSOME}.intervalwgs_v2_GT_only.vcf.bgz", parallel="separate_header")
     #Export everything but genotype info
     #hl.export_vcf(mt, f"{BUCKET}/VCFs/{CHROMOSOME}/{CHROMOSOME}.noGT_after_sampleQC.vcf.bgz")
 
