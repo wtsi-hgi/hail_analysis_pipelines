@@ -36,7 +36,7 @@ with open(f"{thresholds}", 'r') as f:
 
 
 
-def fix_genotpe(mt):
+def fix_genotype(mt):
 
     pl_expr = (
         hl.zip_with_index(mt.PL).flatmap(lambda x: hl.range(x[0] + 1).map(lambda i: hl.cond(i == x[0], x[1], 999))))
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     ############################
     #Haploid VCF fixing of GT
     print("Fix GT haploid")
-    mtX_hap=fix_genotpe(mtX_hap)
+    mtX_hap=fix_genotype(mtX_hap)
     mtX_hap = mtX_hap.checkpoint(f"{tmp_dir}/checkpoints/chrX_haploid_GT_fixed.mt", overwrite=True)
 
 
