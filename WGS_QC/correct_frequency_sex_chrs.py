@@ -103,4 +103,4 @@ if __name__ == "__main__":
     mt_rest=mt.filter_rows(mt.locus.contig == "chrY",keep=False)
     mtY=annotate_allele_counts_chrY(mtY)
     mt=mt_rest.union_rows(mtY)
-    mt=mt.checkpoint(f"{temp_dir}/intervalwgs/WGS_final_january_2020.mt", overwrite=True)
+    mt=mt.checkpoint(f"{tmp_dir}/intervalwgs/WGS_final_january_2020.mt", overwrite=True)
