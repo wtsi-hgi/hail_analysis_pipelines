@@ -98,7 +98,7 @@ if __name__ == "__main__":
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
 
     mt=hl.read_matrix_table(f"{temp_dir}/intervalwes/kousik/WES_AFTER_surgery.mt")
-    samples_sex = hl.import_table(storage["intervalwes"]["s3"]["sex_samples"], impute=True)
+    samples_sex = hl.import_table(storage["intervalwes"]["s3"]["sex_samples"], impute=True, delimiter=",")
     mt = mt.annotate_cols(sex=samples_sex.key_by("ega_sample_name")[mt.s].gender)
     mt=mt.annotate_rows(call_stats= hl.agg.call_stats(mt.GT, mt.alleles))
     mt=mt.annotate_rows(final_AC= mt.call_stats.AC)
