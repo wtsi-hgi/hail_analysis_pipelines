@@ -38,6 +38,8 @@ def annotate_allele_counts_chrX(mt):
     #mt=matrixtable.annotate_cols(sex=sample_info_table.key_by("ID")[matrixtable.s].SEX)
     #calculate call stats(AC,AN, AF filtered by sex and if it's in PAR region)
     #mt=mt.annotate_rows(call_stats_male= hl.agg.filter(mt.sex == 1, hl.agg.call_stats(mt.GT, mt.alleles)))
+    Number_males = mt.aggregate_cols(hl.agg.count_where(mt.sex ==1 ))
+    Number_females = mt.aggregate_cols(hl.agg.count_where(mt.sex ==2 ))
     mt=mt.annotate_rows(call_stats_male_NONPAR= hl.agg.filter(((mt.sex == 1) & (mt.locus.in_x_nonpar())), hl.agg.call_stats(mt.GT, mt.alleles)))
     mt=mt.annotate_rows(call_stats_male_PAR= hl.agg.filter(((mt.sex == 1) & (mt.locus.in_x_par())), hl.agg.call_stats(mt.GT, mt.alleles)))
     mt=mt.annotate_rows(call_stats_female= hl.agg.filter(mt.sex == 2, hl.agg.call_stats(mt.GT, mt.alleles)))
@@ -46,10 +48,15 @@ def annotate_allele_counts_chrX(mt):
     mt=mt.annotate_rows(maleAN_NONPAR = hl.int32(mt.call_stats_male_NONPAR.AN / 2))
     #Add the new AC and AN for males with the AC,AN for females together to get the final count per variant:
     #final_AC and final_AN have the final values
+    ## Calculating total allele number, which will be required for call rate calculation
+    mt=mt.annotate_rows(Total_allele=hl.cond((mt.locus.in_x_nonpar()), ((Number_females*2)+ Number_males), ((Number_females + Number_males)*2)))
+    
     mt=mt.annotate_rows(final_AC= mt.maleAC_NONPAR + mt.call_stats_male_PAR.AC + mt.call_stats_female.AC)
     mt=mt.annotate_rows(final_AN= mt.maleAN_NONPAR + mt.call_stats_male_PAR.AN + mt.call_stats_female.AN) 
     mt=mt.annotate_rows(frequency=hl.float64(mt.final_AC[1]/mt.final_AN))
-    fields_to_drop=['call_stats_male_NONPAR','call_stats_male_PAR','call_stats_female','maleAC_NONPAR','maleAN_NONPAR']
+    mt=mt.annotate_rows(final_call_rate=hl.float64((mt.maleAN_NONPAR + mt.call_stats_male_PAR.AN + mt.call_stats_female.AN)/(mt.Total_allele)))
+
+    fields_to_drop=['call_stats_male_NONPAR','call_stats_male_PAR','call_stats_female','maleAC_NONPAR','maleAN_NONPAR', 'Total_allele']
     mt=mt.drop(*fields_to_drop)
     return mt;
 
@@ -59,6 +66,8 @@ def annotate_allele_counts_chrY(mt):
     #mt=matrixtable.annotate_cols(sex=sample_info_table.key_by("ID")[matrixtable.s].SEX)
     #calculate call stats(AC,AN, AF filtered by sex and if it's in PAR region)
     #mt=mt.annotate_rows(call_stats_male= hl.agg.filter(mt.sex == 1, hl.agg.call_stats(mt.GT, mt.alleles)))
+    Number_males = mt.aggregate_cols(hl.agg.count_where(mt.sex ==1 ))
+    Number_females = mt.aggregate_cols(hl.agg.count_where(mt.sex ==2 ))
     mt=mt.annotate_rows(call_stats_male= hl.agg.filter(mt.sex == 1 , hl.agg.call_stats(mt.GT, mt.alleles)))
     mt=mt.annotate_rows(call_stats_female= hl.agg.filter(mt.sex == 2, hl.agg.call_stats(mt.GT, mt.alleles)))
     #Halve AC for males and halve AN for males and create 2 new fields maleAC, maleAN
@@ -69,6 +78,7 @@ def annotate_allele_counts_chrY(mt):
     mt=mt.annotate_rows(final_AC= mt.maleAC + mt.call_stats_female.AC)
     mt=mt.annotate_rows(final_AN= mt.maleAN + mt.call_stats_female.AN) 
     mt=mt.annotate_rows(frequency=hl.float64(mt.final_AC[1]/mt.final_AN))
+    mt=mt.annotate_rows(final_call_rate=hl.float64((mt.maleAN + mt.call_stats_female.AN)/Number_males))
     fields_to_drop=['call_stats_male','call_stats_female','maleAC','maleAN']
     mt=mt.drop(*fields_to_drop)
     return mt;
@@ -94,6 +104,8 @@ if __name__ == "__main__":
     mt=mt.annotate_rows(final_AC= mt.call_stats.AC)
     mt=mt.annotate_rows(final_AN= mt.call_stats.AN)
     mt=mt.annotate_rows(frequency= hl.float64(mt.final_AC[1]/mt.final_AN))
+    mt=mt.annotate_rows(final_call_rate=hl.float64(0))
+
     #Select chrX only
     mtX=mt.filter_rows(mt.locus.contig == "chrX",keep=True)
     mt_rest=mt.filter_rows(mt.locus.contig == "chrX",keep=False)
@@ -103,4 +115,4 @@ if __name__ == "__main__":
     mt_rest=mt.filter_rows(mt.locus.contig == "chrY",keep=False)
     mtY=annotate_allele_counts_chrY(mtY)
     mt=mt_rest.union_rows(mtY)
-    mt=mt.checkpoint(f"{tmp_dir}/intervalwgs/WGS_final_january_2020.mt", overwrite=True)
+    mt=mt.checkpoint(f"{tmp_dir}/intervalwgs/WGS_final_january_2020_updated.mt", overwrite=True)
