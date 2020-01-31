@@ -53,7 +53,7 @@ if __name__ == "__main__":
     chr_exon_regions=f"{storage['intervalwgs']['s3']['exonic_regions']}/{CHROMOSOME}.txt"
 
     mt_wgs = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_autosomes-full-sampleqc-variantqc-FILTERED.mt")
-    mt=  mt_wgs.filter_rows(mt.locus.contig == CHROMOSOME)
+    mt=  mt_wgs.filter_rows(mt_wgs.locus.contig == CHROMOSOME)
 
     mt = hl.variant_qc(mt)
     mt = mt.annotate_rows(info = mt.info.annotate(AC=mt.variant_qc.AC[1]))
