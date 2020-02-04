@@ -10,7 +10,7 @@ import pyspark
 import json
 import sys
 from pathlib import Path
-
+from bokeh.plotting import output_file, save, show
 
 
 project_root=Path(__file__).parent.parent.parent
@@ -35,6 +35,27 @@ with open(f"{thresholds}", 'r') as f:
 phenotypes = hl.import_table("s3a://intervalwgs-qc/phenotypes_pc_fbc_nmr_olink_somalogic_16-12-1019.csv", impute=True, delimiter=',')
 dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',
                           skip_invalid_loci=True)
+ dbsnp_rows = dbsnp.rows()
+
+nmr=[]
+sysmex=[]
+metabolon_metabolomics=[]
+olink_inf=[]
+olink_cvd2=[]
+olink_cvd3=[]
+olink_neu=[]
+somalogic_proteomics=[]
+fbc=[]
+pcas=[]
+nmr2=[]
+sysmex2=[]
+olink2_inf=[]
+olink2_cvd2=[]
+olink2_cvd3=[]
+olink2_neu=[]
+somalogic2=[]
+fbc2=[]
+
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -49,14 +70,15 @@ if __name__ == "__main__":
     hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
      
-    CHROMOSOME="WGS-autosomes"
-    mt = hl.read_matrix_table(f"{temp_dir}/matrixtables/WGS_autosomes-full-sampleqc-variantqc-FILTERED.mt")
+    CHROMOSOME="WGS"
+    mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_january_2020_updated.mt")
     
     print("Number of initial variants:")
     print(mt.count())
     
-    print("Annotating matrixtable with fbc:")
-    mt = mt.annotate_cols(phenotype=ja[mt.s])
+    print("Annotating matrixtable with phenotypes:")
+    phenotypes=phenotypes.key_by('ID')
+    mt = mt.annotate_cols(phenotype=phenotypes[mt.s])
 
     print("Grouping the phenotypes into lists:")
     ph1=list(mt.phenotype)
@@ -90,27 +112,38 @@ if __name__ == "__main__":
 
 
     print("Linear regression")
-    for index,value in enumerate(nmr[0:10]):
+    for index,value in enumerate(nmr):
         print(nmr2[index])
         pheno_name=nmr2[index]
         gwas = hl.linear_regression_rows(
             y=value,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
-
-        gwas_annotated = gwas_table.annotate(dbsnp=dbsnp_rows[gwas_table.locus, gwas_table.alleles].rsid)
-        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        gwas1=gwas.filter(gwas.p_value < 5e-8 , keep=True)
-       
-        gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-test_pvalue5e-8.table", overwrite=True)
+        
+        #ANNOTATE WITH DBSNP
+        gwas_annotated = gwas.annotate(dbsnp=dbsnp_rows[gwas.locus, gwas.alleles].rsid)
+        #Filter p-value
+        gwas1=gwas_annotated.filter(gwas_annotated.p_value < 5e-8 , keep=True)
+        gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
+        gwas_annotated = gwas_annotated.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}.table", overwrite=True)
+        print(gwas_annotated.count())
         print(gwas1.count())
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", header=True)
+        gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_pvalue-5e-8.tsv.bgz", header=True)
+        gwas_annotated.export(f"{tmp_dir}/gwas/gwas-{pheno_name}.tsv.bgz", header=True)
+       # gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
+          #                       types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
         
-        gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
-                                 types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
 
-        dbsnp_rows = dbsnp.rows()
-        gwas_annotated = gwas_table.annotate(dbsnp=dbsnp_rows[gwas_table.locus, gwas_table.alleles].rsid)
+        print(f"Plotting manhattan plot for {index} - {pheno_name}")
+        p = hl.plot.manhattan(gwas1.p_value, title=f"{pheno_name} GWAS")
+        output_file(f"{temp_dir}/gwas/{index}-{pheno_name}-manhattanplot.html", mode='inline')
+        save(p)
+        print(f"Plotting QQ plot for {index} - {pheno_name}"")    
+        q = hl.plot.qq(gwas1.p_value, collect_all=False, title=f"{pheno_name} QQ plot")
+        output_file(f"{temp_dir}/gwas/{index}-{pheno_name}-QQplot.html", mode='inline')
+        save(q)
 
-    print("export table")
-    gwas_annotated.export(f"{BUCKET}/gwas/gwas_WGS_with_rsID_not_parallel.tsv.bgz", delimiter="\t",header=True)
+
+        print("export table")
+        gwas_annotated.export(f"{BUCKET}/gwas/gwas_WGS_with_rsID_not_parallel.tsv.bgz", delimiter="\t",header=True)
+        print
