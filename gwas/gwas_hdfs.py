@@ -142,8 +142,3 @@ if __name__ == "__main__":
         q = hl.plot.qq(gwas1.p_value, collect_all=False, title=f"{pheno_name} QQ plot")
         output_file(f"{temp_dir}/gwas/{index}-{pheno_name}-QQplot.html", mode='inline')
         save(q)
-
-
-        print("export table")
-        gwas_annotated.export(f"{BUCKET}/gwas/gwas_WGS_with_rsID_not_parallel.tsv.bgz", delimiter="\t",header=True)
-        print
