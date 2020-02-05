@@ -35,7 +35,7 @@ with open(f"{thresholds}", 'r') as f:
 phenotypes = hl.import_table("s3a://intervalwgs-qc/phenotypes_pc_fbc_nmr_olink_somalogic_16-12-1019.csv", impute=True, delimiter=',')
 dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',
                           skip_invalid_loci=True)
- dbsnp_rows = dbsnp.rows()
+dbsnp_rows = dbsnp.rows()
 
 project="INT"
 dataset="WGS"
