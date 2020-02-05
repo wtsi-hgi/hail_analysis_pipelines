@@ -37,6 +37,9 @@ dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", forc
                           skip_invalid_loci=True)
  dbsnp_rows = dbsnp.rows()
 
+project="INT"
+dataset="WGS"
+
 nmr=[]
 sysmex=[]
 metabolon_metabolomics=[]
@@ -122,23 +125,23 @@ if __name__ == "__main__":
         #ANNOTATE WITH DBSNP
         gwas_annotated = gwas.annotate(dbsnp=dbsnp_rows[gwas.locus, gwas.alleles].rsid)
         #Filter p-value
-        gwas1=gwas_annotated.filter(gwas_annotated.p_value < 5e-8 , keep=True)
-        gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
-        gwas_annotated = gwas_annotated.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}.table", overwrite=True)
-        print(gwas_annotated.count())
-        print(gwas1.count())
+        #gwas1=gwas_annotated.filter(gwas_annotated.p_value < 5e-8 , keep=True)
+       # gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
+        gwas_annotated = gwas_annotated.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}.table", overwrite=True)
+       # print(gwas_annotated.count())
+        #print(gwas1.count())
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_pvalue-5e-8.tsv.bgz", header=True)
-        gwas_annotated.export(f"{tmp_dir}/gwas/gwas-{pheno_name}.tsv.bgz", header=True)
+        #gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_pvalue-5e-8.tsv.bgz", header=True)
+        gwas_annotated.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}", header=True, parallel='separate_header')
        # gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
           #                       types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
         
 
         print(f"Plotting manhattan plot for {index} - {pheno_name}")
         p = hl.plot.manhattan(gwas1.p_value, title=f"{pheno_name} GWAS")
-        output_file(f"{temp_dir}/gwas/{index}-{pheno_name}-manhattanplot.html", mode='inline')
+        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{pheno_name}-manhattanplot.html", mode='inline')
         save(p)
         print(f"Plotting QQ plot for {index} - {pheno_name}"")    
         q = hl.plot.qq(gwas1.p_value, collect_all=False, title=f"{pheno_name} QQ plot")
-        output_file(f"{temp_dir}/gwas/{index}-{pheno_name}-QQplot.html", mode='inline')
+        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{pheno_name}-QQplot.html", mode='inline')
         save(q)
