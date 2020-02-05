@@ -140,10 +140,10 @@ if __name__ == "__main__":
         
 
         print(f"Plotting manhattan plot for {index} - {pheno_name}")
-        p = hl.plot.manhattan(gwas1.p_value, title=f"{pheno_name} GWAS")
+        p = hl.plot.manhattan(gwas_annotated.p_value, title=f"{pheno_name} GWAS")
         output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{pheno_name}-manhattanplot.html", mode='inline')
         save(p)
         print(f"Plotting QQ plot for {index} - {pheno_name}")    
-        q = hl.plot.qq(gwas1.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
+        q = hl.plot.qq(gwas_annotated.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
         output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{pheno_name}-QQplot.html", mode='inline')
         save(q)
