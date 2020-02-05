@@ -126,12 +126,14 @@ if __name__ == "__main__":
         gwas_annotated = gwas.annotate(dbsnp=dbsnp_rows[gwas.locus, gwas.alleles].rsid)
         #Filter p-value
         #gwas1=gwas_annotated.filter(gwas_annotated.p_value < 5e-8 , keep=True)
-       # gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
+        # gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
+        print(" Writing gwas table checkpoint")
         gwas_annotated = gwas_annotated.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}.table", overwrite=True)
        # print(gwas_annotated.count())
         #print(gwas1.count())
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
         #gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_pvalue-5e-8.tsv.bgz", header=True)
+        print("Exporting tsv table")
         gwas_annotated.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}", header=True, parallel='separate_header')
        # gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
           #                       types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
