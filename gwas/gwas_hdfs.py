@@ -11,7 +11,7 @@ import json
 import sys
 from pathlib import Path
 from bokeh.plotting import output_file, save, show
-
+from datetime import datetime
 
 project_root=Path(__file__).parent.parent.parent
 print(project_root)
@@ -61,7 +61,9 @@ if __name__ == "__main__":
     #Define the hail persistent storage directory
     tmp_dir = "hdfs://spark-master:9820/"
     temp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
+    now= datetime.now()
+
+    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +'/logfile-{now}.log')z
     #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
     # you may use your own here from your .s3fg file in your home directory
     hadoop_config = sc._jsc.hadoopConfiguration()
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     dbsnp_rows = dbsnp.rows()
 
     CHROMOSOME="WGS"
-    mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_january_2020_updated.mt")
+    mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_february_2020_updated.mt")
     
     print("Number of initial variants:")
     print(mt.count())
@@ -122,7 +124,12 @@ if __name__ == "__main__":
             y=value,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+pcas[0:10], pass_through=[mt.rsid])
         
-        
+        fields_to_drop = ['sum_x', 'y_transpose_x','t_stat' ]
+        gwas_table=gwas_table.drop(*fields_to_drop)
+        gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
+        gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
+        gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
+
         #Filter p-value
         #gwas1=gwas_annotated.filter(gwas_annotated.p_value < 5e-8 , keep=True)
         # gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
@@ -133,7 +140,8 @@ if __name__ == "__main__":
         #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
         #gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_pvalue-5e-8.tsv.bgz", header=True)
         #ANNOTATE WITH DBSNP
-        gwas_annotated = gwas.annotate(dbsnp=dbsnp_rows[gwas.locus, gwas.alleles].rsid)
+        #gwas_table=hl.read_table("hdfs://spark-master:9820/gwas/INT-WGS-gwas-nmr_acace.table")
+        #gwas_annotated = gwas.annotate(dbsnp=dbsnp_rows[gwas.locus, gwas.alleles].rsid)
         print("Exporting tsv table")
         gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}.tsv.bgz", header=True)
        # gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
