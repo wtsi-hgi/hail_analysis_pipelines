@@ -66,7 +66,7 @@ if __name__ == "__main__":
     temp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
     now= datetime.now()
 
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +'/logfile-{now}.log')
+    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +f"/logfile-{now}.log")
     #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
     # you may use your own here from your .s3fg file in your home directory
     hadoop_config = sc._jsc.hadoopConfiguration()
