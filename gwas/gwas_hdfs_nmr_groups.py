@@ -171,7 +171,6 @@ if __name__ == "__main__":
         
         gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table", overwrite=True)
         
-        gwas=hl.read_table("{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table")
         print("Exporting tsv table")
         gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.tsv.bgz", header=True)
         for j in range(len(nmr_new)):
