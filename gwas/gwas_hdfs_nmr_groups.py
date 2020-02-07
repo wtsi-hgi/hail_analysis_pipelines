@@ -168,9 +168,12 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
         gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
         print(" Writing gwas table checkpoint")
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table", overwrite=True)
+        if pheno != 'nmr_acace':
+            gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table", overwrite=True)
+        else:
+            gwas=hl.read_table("{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table")
         print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.tsv.bgz", header=True, overwrite=True)
+        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.tsv.bgz", header=True)
         for j in range(len(nmr_new)):
             print(f"Plotting manhattan {j}:{nmr2_new[j]}")
             p = hl.plot.manhattan(gwas_table.p_value[j][0], title=f"{nmr2_new[j]} GWAS")
