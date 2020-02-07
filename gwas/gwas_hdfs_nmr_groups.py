@@ -66,7 +66,7 @@ if __name__ == "__main__":
     temp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
     now= datetime.now()
 
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +'/logfile-{now}.log')z
+    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +'/logfile-{now}.log')
     #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
     # you may use your own here from your .s3fg file in your home directory
     hadoop_config = sc._jsc.hadoopConfiguration()
@@ -125,43 +125,72 @@ if __name__ == "__main__":
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
 
-    print("Linear regression")
+    nmr_dict={}
     for index,value in enumerate(nmr):
-        print(nmr2[index])
-        pheno_name=nmr2[index]
-        gwas = hl.linear_regression_rows(
-            y=value,
-            x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
-        
-        fields_to_drop = ['sum_x', 'y_transpose_x','t_stat' ]
-        gwas_table=gwas.drop(*fields_to_drop)
-        gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
-        gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
-        gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
+        list1=value.collect()
+        list2=[0 if v is None else 1 for v in list1]
+        nmr_dict[nmr2[index]]=list2
 
-        #Filter p-value
-        #gwas1=gwas_annotated.filter(gwas_annotated.p_value < 5e-8 , keep=True)
-        # gwas1 = gwas1.checkpoint(f"{tmp_dir}/gwas/gwas{pheno_name}-pvalue5e-8.table", overwrite=True)
-        print(" Writing gwas table checkpoint")
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}.table", overwrite=True)
-        # print(gwas_annotated.count())
-        #print(gwas1.count())
-        #gwas1=gwas.filter(gwas.p_value[0].any(lambda x: x < 5e-8 ), keep=True)
-        #gwas1.export(f"{tmp_dir}/gwas/gwas-{pheno_name}_pvalue-5e-8.tsv.bgz", header=True)
-        #ANNOTATE WITH DBSNP
-        #gwas_table=hl.read_table("hdfs://spark-master:9820/gwas/INT-WGS-gwas-nmr_acace.table")
-        #gwas_annotated = gwas.annotate(dbsnp=dbsnp_rows[gwas.locus, gwas.alleles].rsid)
-        print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{pheno_name}.tsv.bgz", header=True)
-       # gwas_table = hl.import_table(f"{tmp_dir}/gwas/gwas-{pheno_name}_test_loop_pvalue-5e-8.tsv.bgz", key=['locus', 'alleles'],
-          #                       types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
-          #                       types={'locus': 'locus<GRCh38>', 'alleles': 'array<str>'})
-        
-        print(f"Plotting manhattan plot for {index} - {pheno_name}")
-        p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
-        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{pheno_name}-manhattanplot.html", mode='inline')
-        save(p)
-        print(f"Plotting QQ plot for {index} - {pheno_name}")    
-        q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
-        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{pheno_name}-QQplot.html", mode='inline')
-        save(q)
+    dict1={}
+    namelist=[]
+    for name, measurements in nmr_dict.items():
+        tuple1=tuple(measurements)
+
+        if tuple1 in dict1:
+            # append the new number to the existing array at this slot
+            dict1[tuple1].append(name)
+        else:
+            # create a new array in this slot
+            dict1[tuple1] = [name]
+
+
+nmr_new=[]
+nmr2_new=[]
+
+
+    print("Linear regression")
+    for key,value in dict1.items():
+    i=0
+        for pheno in ph1:
+            if pheno.startswith('nmr'):
+                if pheno in value:
+                    nmr_new.append(mt.phenotype[pheno])
+                    nmr2_new.append(pheno)
+            print(nmr2_new)
+            i=i+1
+            gwas = hl.linear_regression_rows(
+                y=[nmr_new],
+                x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
+            fields_to_drop = ['sum_x', 'y_transpose_x','t_stat' ]
+            gwas_table=gwas.drop(*fields_to_drop)
+            gwas_table=gwas_table.annotate(nmr_phenotypes=nmr2_new)
+            gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
+            gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
+            gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
+            print(" Writing gwas table checkpoint")
+            gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table")
+            print("Exporting tsv table")
+            gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.tsv.bgz", header=True)
+            for j in range(len(nmr_new)):
+                print(f"Plotting manhattan {j}:{nmr2_new[j]}")
+                p = hl.plot.manhattan(gwas_table.p_value[j][0], title=f"{nmr2_new[j]} GWAS")
+                output_file(f"{temp_dir}/gwas/WGS-manhattan-{nmr2_new[j]}.html", mode='inline')
+                save(p)
+                print(f"Plotting QQ plot for {j} - {nmr2_new[j]}")    
+                q = hl.plot.qq(gwas_table.p_value[j][0], collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
+                output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-QQplot.html", mode='inline')
+                save(q)
+        nmr_new=[]
+        nmr2_new=[]
+            
+    
+
+    
+           # print(f"Plotting manhattan plot for {index} - {pheno_name}")
+           # p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
+           # output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{i}-manhattanplot.html", mode='inline')
+           # save(p)
+           # print(f"Plotting QQ plot for {index} - {pheno_name}")    
+           # q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
+           # output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{i}-QQplot.html", mode='inline')
+           # save(q)
