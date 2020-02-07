@@ -74,7 +74,7 @@ if __name__ == "__main__":
     hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
      
-    phenotypes = hl.import_table("s3a://intervalwgs-qc/phenotypes_pc_fbc_nmr_olink_somalogic_06-02-2020.csv", impute=True, delimiter=',')
+    phenotypes = hl.import_table("s3a://intervalwgs-qc/phenotypes_pc_fbc_nmr_olink_somalogic_07-02-2020.csv", impute=True, delimiter=',')
     #dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',skip_invalid_loci=True)
     #dbsnp_rows = dbsnp.rows()
 
