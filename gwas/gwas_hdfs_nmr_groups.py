@@ -175,11 +175,11 @@ if __name__ == "__main__":
         gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.tsv.bgz", header=True)
         for j in range(len(nmr_new)):
             print(f"Plotting manhattan {j}:{nmr2_new[j]}")
-            p = hl.plot.manhattan(gwas_table.p_value[j], title=f"{nmr2_new[j]} GWAS")
+            p = hl.plot.manhattan(gwas.p_value[j], title=f"{nmr2_new[j]} GWAS")
             output_file(f"{temp_dir}/gwas/WGS-manhattan-{nmr2_new[j]}.html", mode='inline')
             save(p)
             print(f"Plotting QQ plot for {j} - {nmr2_new[j]}")    
-            q = hl.plot.qq(gwas_table.p_value[j], collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
+            q = hl.plot.qq(gwas.p_value[j], collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
             output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-QQplot.html", mode='inline')
             save(q)
         nmr_new=[]
