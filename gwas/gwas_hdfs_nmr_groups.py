@@ -147,17 +147,17 @@ if __name__ == "__main__":
 
     nmr_new=[]
     nmr2_new=[]
-    
+    counter=0
     print("Linear regression")
     for key,value in dict1.items():
-        i=0
+        
         for pheno in ph1:
             if pheno.startswith('nmr'):
                 if pheno in value:
                     nmr_new.append(mt.phenotype[pheno])
                     nmr2_new.append(pheno)
         print(nmr2_new)
-        i=i+1
+            
         gwas = hl.linear_regression_rows(
             y=nmr_new,
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
@@ -168,11 +168,11 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
         gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
         print(" Writing gwas table checkpoint")
-        
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.table", overwrite=True)
+        counter=counter+1
+        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{counter}.table", overwrite=True)
         
         print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{i}.tsv.bgz", header=True)
+        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{counter}.tsv.bgz", header=True)
         for j in range(len(nmr_new)):
             print(f"Plotting manhattan {j}:{nmr2_new[j]}")
             p = hl.plot.manhattan(gwas.p_value[j], title=f"{nmr2_new[j]} GWAS")
