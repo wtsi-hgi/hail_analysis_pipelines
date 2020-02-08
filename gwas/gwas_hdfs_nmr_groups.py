@@ -182,8 +182,8 @@ if __name__ == "__main__":
             q = hl.plot.qq(gwas_table.p_value[j], collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
             output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-QQplot.html", mode='inline')
             save(q)
-    nmr_new=[]
-    nmr2_new=[]
+        nmr_new=[]
+        nmr2_new=[]
             
         
 
