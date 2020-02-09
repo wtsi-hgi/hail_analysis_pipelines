@@ -92,6 +92,7 @@ pcas_names=[]
 covariates_array=[]
 covariates_names=[]
 
+
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     #dbsnp_rows = dbsnp.rows()
 
     CHROMOSOME="WGS"
-    f = open(f"{temp_dir}/intervalwgs/phenotype_clustes.py", "w")
+    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/nmr_phenotype_clustes.py", "w")
     mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_february_2020_updated_rsID.mt")
     
     print("Number of initial variants:")
@@ -161,10 +162,11 @@ if __name__ == "__main__":
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
 
-    all_groups=[nmr,somalogic_proteomics,sysmex,olink_inf, onlink_cvd2,olink_cvd3,olink_neu, fbc]
-    all_names=[nmr2,somalogic2,olink2,somalogic2, sysmex2, olink2_inf, olink2_cvd2,olink2_cvd3,olink2_neu, fbc2]
+    #all_groups=[nmr,somalogic_proteomics,sysmex,olink_inf, onlink_cvd2,olink_cvd3,olink_neu, fbc]
+    #all_names=[nmr2,somalogic2,olink2,somalogic2, sysmex2, olink2_inf, olink2_cvd2,olink2_cvd3,olink2_neu, fbc2]
 
-    
+    all_groups=[nmr]
+    all_names=[nmr2]
     for group,name in zip(all_groups,all_names):
         print_clusters(group,name,f)
        
