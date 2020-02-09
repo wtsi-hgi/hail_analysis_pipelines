@@ -125,37 +125,23 @@ if __name__ == "__main__":
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
 
-    nmr_dict={}
-    for index,value in enumerate(nmr):
-        list1=value.collect()
-        list2=[0 if v is None else 1 for v in list1]
-        nmr_dict[nmr2[index]]=list2
-
-    dict1={}
-    namelist=[]
-    for name, measurements in nmr_dict.items():
-        tuple1=tuple(measurements)
-
-        if tuple1 in dict1:
-            # append the new number to the existing array at this slot
-            dict1[tuple1].append(name)
-        else:
-            # create a new array in this slot
-            dict1[tuple1] = [name]
-    for key,value in dict1.items():
-        print( str(value) + '=>' + str(len(value)))
+   with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotype_clusters.txt", 'r') as f:
+       phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
 
     nmr_new=[]
     nmr2_new=[]
-    counter=0
+    counter=5
     print("Linear regression")
-    for key,value in dict1.items():
-        
+
+    for group in phenotypes_to_run:
+        print("Original group")
+        print(group)
         for pheno in ph1:
             if pheno.startswith('nmr'):
-                if pheno in value and not in :
+                if pheno in group:
                     nmr_new.append(mt.phenotype[pheno])
                     nmr2_new.append(pheno)
+        print("No running gwas with these phenotypes:")
         print(nmr2_new)
             
         gwas = hl.linear_regression_rows(
