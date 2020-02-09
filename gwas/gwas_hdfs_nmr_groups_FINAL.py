@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 from bokeh.plotting import output_file, save, show
 from datetime import datetime
+import ast 
 
 project_root=Path(__file__).parent.parent.parent
 print(project_root)
