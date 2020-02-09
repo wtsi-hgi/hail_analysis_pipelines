@@ -33,7 +33,7 @@ with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
 
-def print_clusters(phenotype_group, phenotype_name):
+def print_clusters(phenotype_group, phenotype_name,filename):
     print("**************************************************")
     nmr_dict={}
     #Create a dictionary with values a list of 1 if measurement in sample, 0 if not. 
@@ -63,8 +63,9 @@ def print_clusters(phenotype_group, phenotype_name):
     for key,value in dict1.items():
    # print(str(key) + '=>'+ str(value) + '=>' + str(len(value)))
         
-        print( str(value) )
-        print(len(value))    
+        print( str(value))
+        filename.write(str(value))
+        filename.write("\n")
 
 project="INT"
 dataset="WGS"
@@ -112,6 +113,7 @@ if __name__ == "__main__":
     #dbsnp_rows = dbsnp.rows()
 
     CHROMOSOME="WGS"
+    f = open(f"{temp_dir}/intervalwgs/phenotype_clustes.py", "w")
     mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_february_2020_updated_rsID.mt")
     
     print("Number of initial variants:")
@@ -120,6 +122,7 @@ if __name__ == "__main__":
     print("Annotating matrixtable with phenotypes:")
     phenotypes=phenotypes.key_by('ID')
     mt = mt.annotate_cols(phenotype=phenotypes[mt.s])
+    
 
     print("Grouping the phenotypes into lists:")
     ph1=list(mt.phenotype)
@@ -163,6 +166,6 @@ if __name__ == "__main__":
 
     
     for group,name in zip(all_groups,all_names):
-        print_clusters(group,name)
+        print_clusters(group,name,f)
        
     print("Done")
