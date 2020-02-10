@@ -34,7 +34,7 @@ if __name__ == "__main__":
         #chunk_list.append(chunk)
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
-        chunk.to_csv(tsvout, sep="\t", header=(not os.path.exists(filename)),compression='gzip', index=False ,mode='a' )
+        chunk.to_csv(tsvout, sep="\t", header=(not os.path.exists(tsvout)),compression='gzip', index=False ,mode='a' )
 
     #df_concat=pd.concat(chunk_list)
     #df.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False )
