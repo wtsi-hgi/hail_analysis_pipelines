@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     nmr_new=[]
     nmr2_new=[]
-    counter=5
+    counter=12
     print("Linear regression")
 
     for group in phenotypes_to_run:
