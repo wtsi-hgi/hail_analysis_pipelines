@@ -1,55 +1,37 @@
 
 '''
-QC for WES project
+format gwas output on farm5
 author: Pavlos Antoniou
-date: 13/01/2020
+date: 10/02/2020
+conda activate pa10
 '''
 
 import os
-import hail as hl
-import pyspark
 import json
 import sys
 from pathlib import Path
+import pandas as pd 
 
 
+#read tsv file in pandasl
 
+#'["blbal"]'.strip("[]")
 
-
-project_root=Path(__file__).parent.parent.parent
-print(project_root)
-
-s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
-print(s3credentials)
-
-storage = os.path.join(project_root , "config_files/storage.json")
-
-thresholds = os.path.join(project_root, "config_files/thresholds.json")
-
-with open(f"{s3credentials}", 'r') as f:
-    credentials = json.load(f)
-
-with open(f"{storage}", 'r') as f:
-    storage = json.load(f)
-
-with open(f"{thresholds}", 'r') as f:
-    thresholds = json.load(f)
-
-
-
+tsv1="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/INT-WGS-gwas-nmr-1.tsv.bgz"
+tsvout="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/INT-WGS-gwas-nmr-acace-final.tsv.bgz"
 if __name__ == "__main__":
-    #need to create spark cluster first before intiialising hail
-    sc = pyspark.SparkContext()
-    #Define the hail persistent storage directory
-    temp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
-    #hdfs storage
-    tmp_dir = "hdfs://spark-master:9820/"
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
-    #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
-    # you may use your own here from your .s3fg file in your home directory
-    hadoop_config = sc._jsc.hadoopConfiguration()
 
-    hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
-    hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
+    #reader = pd.read_csv(file1, delimiter="\t",chunksize=128)
+    #for chunk in reader:
+    df= pd.read_csv(tsv1, delimiter="\t")
 
-    gwas_output=hl.read_table(f"{temp_dir}/intervalwgs/WGS-autosomes-gwasfbc-checkpoint-somalogic_0.05_partitioned")
+    df=df.apply(lambda x: x.strip("[]"), axis=1)
+
+    df.to_csv(tsvout, sep="\t",compression='bz', header=True, index=False )
+
+    
+
+
+
+
+
