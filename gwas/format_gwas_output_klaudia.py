@@ -23,11 +23,11 @@ if __name__ == "__main__":
 
     #reader = pd.read_csv(file1, delimiter="\t",chunksize=128)
     #for chunk in reader:
-    df= pd.read_csv(tsv1, delimiter="\t")
+    df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
 
     df=df.apply(lambda x: x.strip("[]"), axis=1)
 
-    df.to_csv(tsvout, sep="\t",compression='bz', header=True, index=False )
+    df.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False )
 
     
 
