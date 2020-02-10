@@ -22,7 +22,7 @@ tsvout="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_ana
 if __name__ == "__main__":
 
     chunk_list=[]
-    df_chunk = pd.read_csv(tsv1, delimiter="\t",compression='gzip', chunksize=1000000)
+    df_chunk = pd.read_csv(tsv1, delimiter="\t",compression='gzip', chunksize=100000)
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
 
