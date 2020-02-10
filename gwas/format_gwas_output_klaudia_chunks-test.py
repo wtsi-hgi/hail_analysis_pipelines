@@ -28,7 +28,7 @@ if __name__ == "__main__":
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         chunk=chunk.drop(columns=['alleles'])
-        #chunk=chunk[].apply(lambda x: x.str.strip("[]"), axis=1)
+        chunk=chunk[].apply(lambda x: x.str.strip("[]"), axis=1)
         
         #chunk=chunk.apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
