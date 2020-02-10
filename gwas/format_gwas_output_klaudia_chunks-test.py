@@ -11,7 +11,7 @@ import json
 import sys
 from pathlib import Path
 import pandas as pd 
-
+import gzip
 
 #read tsv file in pandasl
 
@@ -19,7 +19,7 @@ import pandas as pd
 
 tsv1="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/10lines.txt.gz"
 tsvout="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/test.bgz"
-f=open(tsvout,'a')
+f=gzip.open(tsvout,'a')
 if __name__ == "__main__":
 
     chunk_list=[]
