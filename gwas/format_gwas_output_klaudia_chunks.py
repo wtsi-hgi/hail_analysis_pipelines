@@ -23,18 +23,17 @@ if __name__ == "__main__":
 
     chunk_list=[]
     df_chunk = pd.read_csv(tsv1, delimiter="\t",compression='gzip', chunksize=100000)
-    i=0
+
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         
         chunk=chunk.apply(lambda x: x.str.strip("[]"), axis=1)
+        chunk=chunk.apply(lambda x: x.str.strip("\""), axis=1)
         #chunk_list.append(chunk)
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
-        if i==0:
-            chunk.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False ,mode='a', quoting = csv.QUOTE_NONE, escapechar = '')
-        else:
-            chunk.to_csv(tsvout, sep="\t",compression='gzip', header=False, index=False ,mode='a', quoting = csv.QUOTE_NONE, escapechar = '' )
-        i=i+1
+        
+        chunk.to_csv(tsvout, sep="\t",compression='gzip', header=False, index=False ,mode='a' )
+
     #df_concat=pd.concat(chunk_list)
     #df.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False )
 
