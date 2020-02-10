@@ -19,6 +19,7 @@ import pandas as pd
 
 tsv1="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/10lines.txt.gz"
 tsvout="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/test.bgz"
+f=open(tsvout,'a')
 if __name__ == "__main__":
 
     chunk_list=[]
@@ -33,12 +34,12 @@ if __name__ == "__main__":
         #chunk_list.append(chunk)
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
-        chunk.to_csv(tsvout, sep="\t",compression='gzip', header=tsvout.tell()==0, index=False ,mode='a' )
+        chunk.to_csv(f, sep="\t",compression='gzip', header=f.tell()==0, index=False ,mode='a' )
 
     #df_concat=pd.concat(chunk_list)
     #df.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False )
 
-    
+    f.close()
 
 
 
