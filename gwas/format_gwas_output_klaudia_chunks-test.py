@@ -30,7 +30,7 @@ if __name__ == "__main__":
         chunk=chunk.drop(columns=['alleles'])
         chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
         
-        chunk['nmr_phenotypes']=chunk['nmr_phenotypes'].apply(lambda x: x.str.strip("\"\""), axis=1)
+        chunk[['nmr_phenotypes']]=chunk[['nmr_phenotypes']].apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
