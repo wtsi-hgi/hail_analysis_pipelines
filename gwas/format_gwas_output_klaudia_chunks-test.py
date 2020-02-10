@@ -39,7 +39,7 @@ if __name__ == "__main__":
     #df_concat=pd.concat(chunk_list)
     #df.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False )
 
-    f.close()
+
 
 
 
