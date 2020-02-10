@@ -29,11 +29,11 @@ if __name__ == "__main__":
         
         chunk=chunk.apply(lambda x: x.str.strip("[]"), axis=1)
         chunk=chunk.drop(columns=['alleles'])
-        #chunk=chunk.apply(lambda x: x.str.strip("\"\""), axis=1)
+        chunk=chunk.apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
-        chunk.to_csv(tsvout, sep="\t",compression='gzip', header=False, index=False ,mode='a' )
+        chunk.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False ,mode='a' )
 
     #df_concat=pd.concat(chunk_list)
     #df.to_csv(tsvout, sep="\t",compression='gzip', header=True, index=False )
