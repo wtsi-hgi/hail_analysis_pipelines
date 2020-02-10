@@ -28,7 +28,7 @@ if __name__ == "__main__":
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         
         chunk=chunk.apply(lambda x: x.str.strip("[]"), axis=1)
-        chunk=chunk.apply(lambda x: x.str.strip("\""), axis=1)
+        chunk=chunk.apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
