@@ -29,7 +29,7 @@ if __name__ == "__main__":
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         chunk=chunk.drop(columns=['alleles'])
        # chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
-        chunk.set_index(['locus','rsid','n','REF','ALT','AF']).apply(pd.Series.explode).reset_index()
+        chunk.set_index(['locus','rsid','n','REF','ALT','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index().drop('level_1', 1)
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
        # chunk[['nmr_phenotypes']]=chunk[['nmr_phenotypes']].apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
