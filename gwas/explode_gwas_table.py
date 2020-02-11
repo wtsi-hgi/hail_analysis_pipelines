@@ -23,14 +23,14 @@ import argparse
 #'["blbal"]'.strip("[]")
 parser = argparse.ArgumentParser()
 
-parser.add_argument("filename", type=str, help="path to the tsv file to be exploded")
+parser.add_argument("--table", type=str, help="path to the gwas table to be exploded")
 parser.parse_args()
 outpath="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/final_tables"
 
 if __name__ == "__main__":
 
     chunk_list=[]
-    df_chunk = pd.read_csv(args.filename, delimiter="\t",compression='gzip', chunksize=1000000)
+    df_chunk = pd.read_csv(args.table, delimiter="\t",compression='gzip', chunksize=1000000)
 
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
