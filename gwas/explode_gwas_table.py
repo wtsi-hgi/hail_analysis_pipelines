@@ -50,7 +50,7 @@ if __name__ == "__main__":
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
         for i, x in chunk.groupby('nmr_phenotypes'):
-            p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}_test.csv.gz".format(i.lower()))
+            p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}.final.tsv.gz".format(i.lower()))
             x.to_csv(p, sep="\t", header=(not os.path.exists(p)),compression='gzip',index=False, mode='a')
 
         #chunk.to_csv(tsvout, sep="\t", header=(not os.path.exists(tsvout)),compression='gzip', index=True ,mode='a' )
