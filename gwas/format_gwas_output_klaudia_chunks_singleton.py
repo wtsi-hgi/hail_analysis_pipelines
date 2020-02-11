@@ -23,7 +23,7 @@ parser.add_argument("--table", type=str, help="path to the gwas table to be expl
 parser.add_argument("--phenotype", type=str, help="phenotype name")
 args=parser.parse_args()
 outpath="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/final_tables"
-p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}.singleton.tsv.gz".format(phenotype.lower()))
+p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}.singleton.tsv.gz".format(args.phenotype.lower()))
 if __name__ == "__main__":
 
     chunk_list=[]
