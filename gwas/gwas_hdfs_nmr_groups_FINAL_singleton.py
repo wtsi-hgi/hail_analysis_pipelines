@@ -126,7 +126,7 @@ if __name__ == "__main__":
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
 
-    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotype_clusters.txt", 'r') as f:
+    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotype_clusters_singletons.txt", 'r') as f:
         phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
 
     nmr_new=[]
@@ -156,10 +156,10 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
         print(" Writing gwas table checkpoint")
         counter=counter+1
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{counter}.table", overwrite=True)
+        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{nmr2_new[0]}.table", overwrite=True)
         
         print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{counter}.tsv.bgz", header=True)
+        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{nmr2_new[0]}.tsv.bgz", header=True)
         for j in range(len(nmr_new)):
             print(f"Plotting manhattan {j}:{nmr2_new[j]}")
             p = hl.plot.manhattan(gwas.p_value[j], title=f"{nmr2_new[j]} GWAS")
