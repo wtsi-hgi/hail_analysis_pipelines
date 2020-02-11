@@ -24,7 +24,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--table", type=str, help="path to the gwas table to be exploded")
-parser.parse_args()
+args=parser.parse_args()
 outpath="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/final_tables"
 
 if __name__ == "__main__":
