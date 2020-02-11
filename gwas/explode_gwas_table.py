@@ -22,8 +22,9 @@ import argparse
 
 #'["blbal"]'.strip("[]")
 parser = argparse.ArgumentParser()
-parser.parse_args()
+
 parser.add_argument("filename", type=str, help="path to the tsv file to be exploded")
+parser.parse_args()
 outpath="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/final_tables"
 
 if __name__ == "__main__":
