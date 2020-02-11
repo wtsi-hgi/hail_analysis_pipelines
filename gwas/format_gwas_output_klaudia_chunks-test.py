@@ -42,6 +42,7 @@ if __name__ == "__main__":
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
         chunk=chunk.set_index(['locus','rsid','n','REF','ALT','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
         chunk=chunk.reset_index()
+    
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
        # chunk[['nmr_phenotypes']]=chunk[['nmr_phenotypes']].apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         
         for i, x in chunk.groupby('nmr_phenotypes'):
             p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}_test.csv.gz".format(i.lower()))
-            x.to_csv(p, sep="\t", header=(not os.path.exists(p)),compression='gzip',index=True, mode='a')
+            x.to_csv(p, sep="\t", header=(not os.path.exists(p)),compression='gzip',index=False, mode='a')
 
         #chunk.to_csv(tsvout, sep="\t", header=(not os.path.exists(tsvout)),compression='gzip', index=True ,mode='a' )
 
