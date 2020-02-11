@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 import pandas as pd 
 import gzip
+import numpy as np
 
 #read tsv file in pandasl
 
