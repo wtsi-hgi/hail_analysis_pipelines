@@ -131,7 +131,6 @@ if __name__ == "__main__":
 
     nmr_new=[]
     nmr2_new=[]
-    counter=12
     print("Linear regression")
 
     for group in phenotypes_to_run:
@@ -154,8 +153,10 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
         gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
         gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
+        gwas_table=gwas_table.drop('alleles')
+        gwas_table=gwas_table.select('locus','rsid','REF','ALT','n', 'AF', 'beta', 'standard_error', 'p_value','nmr_phenotypes')
         print(" Writing gwas table checkpoint")
-        counter=counter+1
+        
         gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{nmr2_new[0]}.table", overwrite=True)
         
         print("Exporting tsv table")
