@@ -1,4 +1,3 @@
-['nmr_ace']
 ['nmr_ala']
 ['nmr_crea']
 ['nmr_dag']
