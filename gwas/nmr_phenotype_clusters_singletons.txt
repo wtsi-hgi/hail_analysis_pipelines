@@ -1,5 +1,3 @@
-['nmr_ala']
-['nmr_crea']
 ['nmr_dag']
 ['nmr_dagtg']
 ['nmr_freec']
