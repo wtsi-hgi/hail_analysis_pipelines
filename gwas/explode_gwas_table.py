@@ -30,7 +30,7 @@ outpath="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_an
 if __name__ == "__main__":
 
     chunk_list=[]
-    df_chunk = pd.read_csv(args.table, delimiter="\t",compression='gzip', chunksize=1000000, low_memory=False)
+    df_chunk = pd.read_csv(args.table, delimiter="\t",compression='gzip', chunksize=1000000)
 
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
@@ -38,10 +38,10 @@ if __name__ == "__main__":
         chunk.standard_error = chunk.standard_error.apply(literal_eval)
         chunk.p_value = chunk.p_value.apply(literal_eval)
         chunk.nmr_phenotypes = chunk.nmr_phenotypes.apply(literal_eval)
-        chunk=chunk.drop(columns=['alleles'])
+        #chunk=chunk.drop(columns=['alleles'])
        # chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
-        chunk=chunk.set_index(['locus','rsid','n','REF','ALT','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
+        chunk=chunk.set_index(['locus','alleles','rsid','n','REF','ALT','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
         chunk=chunk.reset_index()
     
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
