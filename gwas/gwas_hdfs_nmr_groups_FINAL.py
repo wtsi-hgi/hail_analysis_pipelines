@@ -156,7 +156,7 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
         gwas_table=gwas_table.key_by('locus')
         gwas_table=gwas_table.drop('alleles')
-        gwas_table=gwas_table.select('locus','rsid','REF','ALT','n', 'AF', 'beta', 'standard_error', 'p_value','nmr_phenotypes')
+        gwas_table=gwas_table.select('rsid','REF','ALT','n', 'AF', 'beta', 'standard_error', 'p_value','nmr_phenotypes')
         print(" Writing gwas table checkpoint")
         counter=counter+1
         gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{counter}.table", overwrite=True)
