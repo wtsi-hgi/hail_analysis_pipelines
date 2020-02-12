@@ -163,7 +163,7 @@ if __name__ == "__main__":
         for j in range(len(nmr_new)):
             print(f"Plotting manhattan {j}:{nmr2_new[j]}")
             p = hl.plot.manhattan(gwas.p_value, title=f"{nmr2_new[j]} GWAS")
-            output_file(f"{temp_dir}/gwas/WGS-manhattan-{nmr2_new[j]}.html", mode='inline')
+            output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-manhattan.html", mode='inline')
             save(p)
             print(f"Plotting QQ plot for {j} - {nmr2_new[j]}")    
             q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
