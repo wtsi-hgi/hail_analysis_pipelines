@@ -24,9 +24,11 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--table", type=str, help="path to the gwas table to be exploded")
+parser.add_argument("--number", type=str, help="id for outfile")
+
 args=parser.parse_args()
 outpath="/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/final_tables"
-
+id_out=args.number
 if __name__ == "__main__":
 
     chunk_list=[]
@@ -50,7 +52,7 @@ if __name__ == "__main__":
         #chunk.columns=['locus',	'alleles',	'rsid',	'n', 'beta','standard_error','p_value',	'nmr_phenotypes','REF',	'ALT','AF']
         
         for i, x in chunk.groupby('nmr_phenotypes'):
-            p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}.final.tsv.gz".format(i.lower()))
+            p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}.{}.tsv.gz".format(i.lower(), id_out))
             x.to_csv(p, sep="\t", header=(not os.path.exists(p)),compression='gzip',index=False, mode='a')
 
         #chunk.to_csv(tsvout, sep="\t", header=(not os.path.exists(tsvout)),compression='gzip', index=True ,mode='a' )
