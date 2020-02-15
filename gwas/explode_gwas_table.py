@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     chunk_list=[]
     colnames=['locus','alleles','rsid','n','beta','standard_error','p_value','nmr_phenotypes','REF','ALT','AF']
-    df_chunk = pd.read_csv(args.table, delimiter="\t",compression='gzip', chunksize=1000000, names=colnames, header=None)
+    df_chunk = pd.read_csv(args.table, delimiter="\t",compression='gzip', chunksize=500000, names=colnames, header=None)
 
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
