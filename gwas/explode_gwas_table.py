@@ -37,10 +37,10 @@ if __name__ == "__main__":
 
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
-        chunk.beta = chunk.beta.apply(literal_eval)
-        chunk.standard_error = chunk.standard_error.apply(literal_eval)
-        chunk.p_value = chunk.p_value.apply(literal_eval)
-        chunk.nmr_phenotypes = chunk.nmr_phenotypes.apply(literal_eval)
+        chunk['beta'] = chunk['beta'].apply(literal_eval)
+        chunk['standard_error'] = chunk['standard_error'].apply(literal_eval)
+        chunk['p_value'] = chunk['p_value'].apply(literal_eval)
+        chunk['nmr_phenotypes'] = chunk['nmr_phenotypes'].apply(literal_eval)
         #chunk=chunk.drop(columns=['alleles'])
        # chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
