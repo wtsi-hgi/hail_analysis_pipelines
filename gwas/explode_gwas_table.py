@@ -32,9 +32,10 @@ id_out=args.number
 if __name__ == "__main__":
 
     chunk_list=[]
+    #locus   alleles rsid    n       beta    standard_error  p_value nmr_phenotypes  REF     ALT     AF
     colnames=['locus','alleles','rsid','n','beta','standard_error','p_value','nmr_phenotypes','REF','ALT','AF']
     df_chunk = pd.read_csv(args.table, delimiter="\t", names=colnames, compression='gzip', chunksize=500000, header=None, low_memory=False)
-
+    print(df_chunk['rsid'])
     for chunk in df_chunk:
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         chunk['beta'] = chunk['beta'].apply(literal_eval)
@@ -44,11 +45,11 @@ if __name__ == "__main__":
         chunk=chunk.drop(columns=['alleles'])
        # chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
-        chunk=chunk.set_index(['locus','rsid', 'REF','ALT','n','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
+        chunk=chunk.set_index(['locus', 'rsid' , 'REF','ALT','n','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
         #locus, rsid, REF, ALT, n, AF, beta, standard_error, p_value, nmr_phenotypes
         #chunk=chunk.drop(columns=['level_5'])
         chunk=chunk.reset_index()
- 
+        print(chunk)
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
        # chunk[['nmr_phenotypes']]=chunk[['nmr_phenotypes']].apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
