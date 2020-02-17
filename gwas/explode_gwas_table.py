@@ -46,7 +46,7 @@ if __name__ == "__main__":
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
         chunk=chunk.set_index(['locus','rsid', 'REF','ALT','n','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
         #locus, rsid, REF, ALT, n, AF, beta, standard_error, p_value, nmr_phenotypes
-        chunk=chunk.drop(columns=['level_5'])
+        #chunk=chunk.drop(columns=['level_5'])
         chunk=chunk.reset_index()
  
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
