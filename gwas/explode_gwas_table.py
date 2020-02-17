@@ -41,10 +41,12 @@ if __name__ == "__main__":
         chunk['standard_error'] = chunk['standard_error'].apply(literal_eval)
         chunk['p_value'] = chunk['p_value'].apply(literal_eval)
         chunk['nmr_phenotypes'] = chunk['nmr_phenotypes'].apply(literal_eval)
-        #chunk=chunk.drop(columns=['alleles'])
+        chunk=chunk.drop(columns=['alleles'])
        # chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
-        chunk=chunk.set_index(['locus','rsid','REF','ALT', 'n','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
+        chunk=chunk.set_index(['locus','rsid', 'REF','ALT','n','AF']).apply(lambda x: x.apply(pd.Series).stack()).reset_index(level=1, drop=True)
+        #locus, rsid, REF, ALT, n, AF, beta, standard_error, p_value, nmr_phenotypes
+        chunk=chunk.drop(columns=['level_5'])
         chunk=chunk.reset_index()
  
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
