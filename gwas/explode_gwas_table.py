@@ -35,8 +35,9 @@ if __name__ == "__main__":
     #locus   alleles rsid    n       beta    standard_error  p_value nmr_phenotypes  REF     ALT     AF
     colnames=['locus','alleles','rsid','n','beta','standard_error','p_value','nmr_phenotypes','REF','ALT','AF']
     df_chunk = pd.read_csv(args.table, delimiter="\t", names=colnames, compression='gzip', chunksize=500000, header=None, low_memory=False)
-    print(df_chunk['rsid'])
+    
     for chunk in df_chunk:
+        print(chunk['rsid'])
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         chunk['beta'] = chunk['beta'].apply(literal_eval)
         chunk['standard_error'] = chunk['standard_error'].apply(literal_eval)
