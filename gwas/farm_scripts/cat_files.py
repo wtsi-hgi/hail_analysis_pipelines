@@ -29,7 +29,7 @@ for path in allpaths:
 print(data) 
 
 for i,j in enumerate(data):
-    print(f"cat INT-WGS-gwas-nmr-{j}.*.tsv.bgz > ../INT-WGS-gwas-nmr-{j}.tsv.bgz")
+    print(f"cat INT-WGS-gwas-nmr-{j}.*.tsv.gz > ../INT-WGS-gwas-nmr-{j}.tsv.bgz")
         
     
     #print(filename)
