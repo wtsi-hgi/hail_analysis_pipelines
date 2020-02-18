@@ -18,7 +18,7 @@ for path in allpaths:
     info={}
     filename=path.stem
     print(path.stem)
-    m=re.search(r'INT-WGS-gwas-nmr-(.*).(\w+).tsv', filename)
+    m=re.search(r'INT-WGS-gwas-nmr-(.*)\.(\w+).tsv', filename)
     if m:
         name=m.group(1)
         print(name)
