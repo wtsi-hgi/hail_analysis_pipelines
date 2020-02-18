@@ -37,17 +37,17 @@ if __name__ == "__main__":
     df_chunk = pd.read_csv(args.table, delimiter="\t", names=colnames, compression='gzip', chunksize=500000, header=None, low_memory=False)
     
     for chunk in df_chunk:
-        print(chunk['rsid'])
-        print(chunk)
-        print("before")
+        #print(chunk['rsid'])
+        #print(chunk)
+        #print("before")
     #df= pd.read_csv(tsv1, delimiter="\t", compression='gzip')
         chunk['beta'] = chunk['beta'].apply(literal_eval)
         chunk['standard_error'] = chunk['standard_error'].apply(literal_eval)
         chunk['p_value'] = chunk['p_value'].apply(literal_eval)
         chunk['nmr_phenotypes'] = chunk['nmr_phenotypes'].apply(literal_eval)
         chunk=chunk.drop(columns=['alleles'])
-        print("after:")
-        print(chunk)
+        #print("after:")
+        #print(chunk)
         
        # chunk[['beta','standard_error','p_value','nmr_phenotypes']]=chunk[['beta','standard_error','p_value','nmr_phenotypes']].apply(lambda x: x.str.strip("[]"), axis=1)
         #explode(chunk, lst_cols=['beta','standard_error','p_value','nmr_phenotypes'])
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         #locus, rsid, REF, ALT, n, AF, beta, standard_error, p_value, nmr_phenotypes
         #chunk=chunk.drop(columns=['level_5'])
         #chunk=chunk.reset_index()
-        print(chunk)
+        #print(chunk)
         #chunk=chunk.explode(['beta','standard_error','p_value','nmr_phenotypes'])
        # chunk[['nmr_phenotypes']]=chunk[['nmr_phenotypes']].apply(lambda x: x.str.strip("\"\""), axis=1)
         #chunk_list.append(chunk)
