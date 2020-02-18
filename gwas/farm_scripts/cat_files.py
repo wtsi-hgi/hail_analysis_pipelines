@@ -14,7 +14,7 @@ data=[]
 
 
 for path in allpaths:
-    #print(path)
+    print(path)
     info={}
     filename=path.stem
     m=re.search(r'INT-WGS-gwas-nmr-(.*).(\w+).tsv.gz', filename)
