@@ -14,11 +14,11 @@ data=[]
 
 
 for path in allpaths:
-    print(path)
+    #print(path)
     info={}
     filename=path.stem
     print(path.stem)
-    m=re.search(r'INT-WGS-gwas-nmr-(.*).(\w+).tsv.gz', filename)
+    m=re.search(r'INT-WGS-gwas-nmr-(.*).(.*).tsv.gz', filename)
     if m:
         name=m.group(1)
         print(name)
