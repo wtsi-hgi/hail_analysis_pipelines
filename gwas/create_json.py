@@ -12,25 +12,29 @@ allpaths=[p for p in pathlib.Path(plots_path).iterdir() if p.is_file()]
 
 data=[]
 
-project ="WGS"
+i=1
 for path in allpaths:
     #print(path)
     info={}
     filename=path.stem
-    m=re.search(r'INT-W[G|E]S-(.*)-', filename)
+    m=re.search(r'INT-(W[G|E]S)-(.*)-', filename)
     if m:
-        name=m.group(1)
-       # print(name)
+        
+        project=m.group(1)
+        print(project)
+        name=m.group(2)
+        print(name)
         
     if "QQplot" in filename:
-        info['project']=project,
+        info['id']=i
+        info['project']=project
         info['category']='nmr'
         info['name']=name
         qqplot="data/img/"+filename+".html"
         #print(qqplot)
         info['qqplot']=qqplot
-        info['manhattan']="data/img/"+"INT-{project}-"+name+"-manhattan.html"
-    
+        info['manhattan']="data/img/"+f"INT-{project}-{name}-manhattan.html"
+        i=i+1
     data.append(info)
     #print(filename)
 
