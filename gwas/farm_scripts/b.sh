@@ -138,33 +138,33 @@ conda init bash
 conda activate pa10
 python3 /lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/scripts/hail_analysis_pipelines/gwas/explode_gwas_table.py --table /lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/big-bz.gz --number bz
 
-
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutba.o -e joberroraa.e ./explode.sh ba
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbb.o -e joberrorab.e ./explode.sh bb
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbc.o -e joberrorac.e ./explode.sh bc 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbd.o -e joberrorad.e ./explode.sh bd 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbe.o -e joberrorae.e ./explode.sh be 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbf.o -e joberroraf.e ./explode.sh bf 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbg.o -e joberrorag.e ./explode.sh bg 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbh.o -e joberrorah.e ./explode.sh bh 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbi.o -e joberrorai.e ./explode.sh bi 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbj.o -e joberroraj.e ./explode.sh bj 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbk.o -e joberrorak.e ./explode.sh bk 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbl.o -e joberroral.e ./explode.sh bl 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbm.o -e joberroram.e ./explode.sh bm 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbn.o -e joberroran.e ./explode.sh bn 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbo.o -e joberrorao.e ./explode.sh bo 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbp.o -e joberrorap.e ./explode.sh bp 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbq.o -e joberroraq.e ./explode.sh bq 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbr.o -e joberrorar.e ./explode.sh br 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbs.o -e joberroras.e ./explode.sh bs 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbt.o -e joberrorat.e ./explode.sh bt 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbu.o -e joberrorau.e ./explode.sh bu 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbv.o -e joberrorav.e ./explode.sh bv 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbw.o -e joberroraw.e ./explode.sh bw 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbx.o -e joberrorax.e ./explode.sh be 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutby.o -e joberroray.e ./explode.sh by 
-bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o joboutbz.o -e joberroraz.e ./explode.sh bz
+instance=1
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutba.o -e joberroraa.e ./explode.sh ba  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbb.o -e joberrorab.e ./explode.sh bb  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbc.o -e joberrorac.e ./explode.sh bc  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbd.o -e joberrorad.e ./explode.sh bd  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbe.o -e joberrorae.e ./explode.sh be  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbf.o -e joberroraf.e ./explode.sh bf  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbg.o -e joberrorag.e ./explode.sh bg  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbh.o -e joberrorah.e ./explode.sh bh  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbi.o -e joberrorai.e ./explode.sh bi  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbj.o -e joberroraj.e ./explode.sh bj  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbk.o -e joberrorak.e ./explode.sh bk  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbl.o -e joberroral.e ./explode.sh bl  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbm.o -e joberroram.e ./explode.sh bm  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbn.o -e joberroran.e ./explode.sh bn  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbo.o -e joberrorao.e ./explode.sh bo  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbp.o -e joberrorap.e ./explode.sh bp  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbq.o -e joberroraq.e ./explode.sh bq  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbr.o -e joberrorar.e ./explode.sh br  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbs.o -e joberroras.e ./explode.sh bs  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbt.o -e joberrorat.e ./explode.sh bt  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbu.o -e joberrorau.e ./explode.sh bu  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbv.o -e joberrorav.e ./explode.sh bv  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbw.o -e joberroraw.e ./explode.sh bw  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbx.o -e joberrorax.e ./explode.sh be  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutby.o -e joberroray.e ./explode.sh by  $instance
+bsub -q long -G hgi -R'select[mem>10000] rusage[mem=10000]' -M10000  -o joboutbz.o -e joberroraz.e ./explode.sh bz $instance
 
 
 

@@ -129,6 +129,7 @@ if __name__ == "__main__":
     with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotype_clusters_multi.txt", 'r') as f:
         phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
 
+
     nmr_new=[]
     nmr2_new=[]
     counter=1
