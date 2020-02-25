@@ -91,7 +91,14 @@ fbc2=[]
 pcas_names=[]
 covariates_array=[]
 covariates_names=[]
-
+covariates_olinkf=[]
+covariates_olinkf_names=[]
+covariates_olinkcvd2=[]
+covariates_olinkcvd2_names=[]
+covariates_olinkcvd3=[]
+covariates_olinkcvd3_names=[]
+covariates_olinkneu=[]
+covariates_olinkneu_names=[]
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
@@ -101,7 +108,7 @@ if __name__ == "__main__":
     temp_dir = os.path.join(os.environ["HAIL_HOME"], "tmp")
     now= datetime.now()
 
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +'/logfile-{now}.log')
+    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38", log=temp_dir +f'/logfile-{now}.log')
     #s3 credentials required for user to access the datasets in farm flexible compute s3 environment
     # you may use your own here from your .s3fg file in your home directory
     hadoop_config = sc._jsc.hadoopConfiguration()
@@ -114,7 +121,7 @@ if __name__ == "__main__":
     #dbsnp_rows = dbsnp.rows()
 
     CHROMOSOME="WGS"
-    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/nmr_phenotype_clustes.py", "w")
+    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/olink_phenotype_clusters.txt", "w")
     mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_february_2020_updated_rsID.mt")
     
     print("Number of initial variants:")
@@ -141,17 +148,33 @@ if __name__ == "__main__":
             sysmex.append(mt.phenotype[pheno])
             sysmex2.append(pheno)
         elif pheno.startswith('olinkinf'):
-            olink_inf.append(mt.phenotype[pheno])
-            olink2_inf.append(pheno)
+            if pheno == 'olinkf_plate':
+                covariates_olinkf.append(hl.float64(mt.phenotype[pheno]))
+                covariates_olinkf_names.append(pheno)
+            else:
+                olink_inf.append(mt.phenotype[pheno])
+                olink2_inf.append(pheno)
         elif pheno.startswith('olinkcvd2'):
-            olink_cvd2.append(mt.phenotype[pheno])
-            olink2_cvd2.append(pheno)
+            if pheno == 'olinkcvd2_plate':
+                covariates_olinkcvd2.append(hl.float64(mt.phenotype[pheno]))
+                covariates_olinkcvd2_names.append(pheno)
+            else:
+                olink_cvd2.append(mt.phenotype[pheno])
+                olink2_cvd2.append(pheno)
         elif pheno.startswith('olinkcvd3'):
-            olink_cvd3.append(mt.phenotype[pheno])
-            olink2_cvd3.append(pheno)
+            if pheno == 'olinkcvd3_plate':
+                covariates_olinkcvd3.append(hl.float64(mt.phenotype[pheno]))
+                covariates_olinkcvd3_names.append(pheno)
+            else:
+                olink_cvd3.append(mt.phenotype[pheno])
+                olink2_cvd3.append(pheno)
         elif pheno.startswith('olinkneu'):
-            olink_neu.append(mt.phenotype[pheno])
-            olink2_neu.append(pheno)
+            if pheno == 'olinkneu_plate':
+                covariates_olinkneu.append(hl.float64(mt.phenotype[pheno]))
+                covariates_olinkneu_names.append(pheno)
+            else:
+                olink_neu.append(mt.phenotype[pheno])
+                olink2_neu.append(pheno)
         elif pheno.startswith('fbc'):
             fbc.append(mt.phenotype[pheno])
             fbc2.append(pheno)
@@ -162,11 +185,11 @@ if __name__ == "__main__":
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
 
-    #all_groups=[nmr,somalogic_proteomics,sysmex,olink_inf, onlink_cvd2,olink_cvd3,olink_neu, fbc]
-    #all_names=[nmr2,somalogic2,olink2,somalogic2, sysmex2, olink2_inf, olink2_cvd2,olink2_cvd3,olink2_neu, fbc2]
+    #all_groups=[nmr,somalogic_proteomics,sysmex,olink_inf, olink_cvd2,olink_cvd3,olink_neu, fbc]
+    #all_names=[nmr2,somalogic2,somalogic2, sysmex2, olink2_inf, olink2_cvd2,olink2_cvd3,olink2_neu, fbc2]
 
-    all_groups=[nmr]
-    all_names=[nmr2]
+    all_groups=[olink_inf, olink_cvd2,olink_cvd3,olink_neu]
+    all_names=[olink2_inf, olink2_cvd2,olink2_cvd3,olink2_neu]
     for group,name in zip(all_groups,all_names):
         print_clusters(group,name,f)
        
