@@ -46,7 +46,7 @@ if __name__ == "__main__":
         chunk['standard_error'] = chunk['standard_error'].apply(literal_eval)
         chunk['p_value'] = chunk['p_value'].apply(literal_eval)
         chunk['nmr_phenotypes'] = chunk['nmr_phenotypes'].apply(literal_eval)
-        chunk=chunk.drop(columns=['alleles'])
+        #chunk=chunk.drop(columns=['alleles'])
         #print("after:")
         #print(chunk)
         
