@@ -125,7 +125,7 @@ if __name__ == "__main__":
 
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
-
+    #make sure the input file has no empty line at the end 
     with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotype_clusters_singletons_redo.txt", 'r') as f:
         phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
 
