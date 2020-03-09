@@ -1,5 +1,6 @@
-['nmr_dag']
-['nmr_daghg']
+['nmr_dagtg']
+['nmr_faw3fa']
+['nmr_dhafa']
 ['nmr_freec']
 ['nmr_gln']
 ['nmr_gly']
