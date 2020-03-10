@@ -98,8 +98,8 @@ if __name__ == "__main__":
 
     #Write to disk
     print("writing chrY ")
-    newmtY=newmtY.checkpoint(f"{tmp_dir}/intervalwgs/sex_chromosomes/chrY_final_AC_corrected_filtered_variant_QC_ordered_FINAL.mt")
+    newmtY=newmtY.checkpoint(f"{tmp_dir}/intervalwgs/sex_chromosomes/chrY_final_AC_corrected_filtered_variant_QC_ordered_FINAL.mt", overwrite=True)
     print("writing chrX ")
-    newmtX=newmtX.checkpoint(f"{tmp_dir}/intervalwgs/sex_chromosomes/chrX_final_AC_corrected_filtered_variant_QC_ordered_FINAL.mt")
+    newmtX=newmtX.checkpoint(f"{tmp_dir}/intervalwgs/sex_chromosomes/chrX_final_AC_corrected_filtered_variant_QC_ordered_FINAL.mt", overwrite=True)
     print("writing WGS ")
-    mt=mt.checkpoint(f"{tmp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt")
+    mt=mt.checkpoint(f"{tmp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt", overwrite=True)
