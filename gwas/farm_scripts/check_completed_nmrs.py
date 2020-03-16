@@ -20,12 +20,12 @@ for path in allpaths:
     info={}
 
     filename=path.stem
-    print(path.stem)
+    #print(path.stem)
     m=re.search(r'INT-WGS-gwas-nmr-(.*).tsv', filename)
     if m:
         name=m.group(1)
-        print(name)
-        if name in data:
+        #print(name)
+        if name not in data:
            data.append(name)
 
 print(data)
