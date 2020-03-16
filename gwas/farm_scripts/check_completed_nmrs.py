@@ -8,7 +8,7 @@ import re
 plots_path="/lustre/scratch119/humgen/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/gwas_tables"
 allpaths=[p for p in pathlib.Path(plots_path).iterdir() if p.is_file()]
 
-print(allpaths)
+#print(allpaths)
 
 data=[]
 nmr_phenotypes='/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/gwas_tables/nmr_pheno_names.txt'
@@ -20,7 +20,7 @@ for path in allpaths:
     info={}
 
     filename=path.stem
-    #print(path.stem)
+    print(path.stem)
     m=re.search(r'INT-WGS-gwas-nmr-(.*).tsv.bgz', filename)
     if m:
         name=m.group(1)
