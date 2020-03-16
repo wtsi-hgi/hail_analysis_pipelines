@@ -1,1 +1,1 @@
-['nmr_glc_']
+['nmr_glc']
