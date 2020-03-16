@@ -28,7 +28,7 @@ for path in allpaths:
         if name in data:
            data.append(name)
 
-
+print(data)
 for ph in lines:
     if ph not in data:
         print(ph)
