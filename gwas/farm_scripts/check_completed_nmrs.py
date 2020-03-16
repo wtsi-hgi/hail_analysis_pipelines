@@ -5,7 +5,7 @@ import pathlib
 from pathlib import Path
 import re
 #open path 
-plots_path="/lustre/scratch119/humgen/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/tables/final_tables"
+plots_path="/lustre/scratch119/humgen/projects/interval_wgs/analysis/hail_analysis/gwas/nmr_results/gwas_tables"
 allpaths=[p for p in pathlib.Path(plots_path).iterdir() if p.is_file()]
 
 #print(allpaths)
@@ -21,7 +21,7 @@ for path in allpaths:
 
     filename=path.stem
     #print(path.stem)
-    m=re.search(r'INT-WGS-gwas-nmr-(.*)\.(\w+).tsv', filename)
+    m=re.search(r'INT-WGS-gwas-nmr-(.*)\.(\w+).tsv.bgz', filename)
     if m:
         name=m.group(1)
         #print(name)
