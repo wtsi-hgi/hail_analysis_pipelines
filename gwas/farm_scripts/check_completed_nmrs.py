@@ -25,8 +25,9 @@ for path in allpaths:
     if m:
         name=m.group(1)
         #print(name)
-        if name not in data:
+        if name in data:
            data.append(name)
+
 
 for ph in lines:
     if ph not in data:
