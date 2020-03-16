@@ -21,7 +21,7 @@ for path in allpaths:
 
     filename=path.stem
     #print(path.stem)
-    m=re.search(r'INT-WGS-gwas-nmr-(.*)\.(\w+).tsv.bgz', filename)
+    m=re.search(r'INT-WGS-gwas-nmr-(.*).tsv.bgz', filename)
     if m:
         name=m.group(1)
         #print(name)
