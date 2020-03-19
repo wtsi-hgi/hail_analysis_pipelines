@@ -154,8 +154,8 @@ if __name__ == "__main__":
 
         print("No running gwas with these phenotypes:")
         print(nmr2_new)
-        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.call_stats(mt.GT, mt.alleles)))
-        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.count_where(mt.GT.is_het())))
+        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(nmr_new[0]), hl.agg.call_stats(mt.GT, mt.alleles)))
+        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(nmr_new[0]), hl.agg.count_where(mt.GT.is_het())))
         ## Applying MAF filter -- basically removing singletones and alternative AC = 0
         mt = mt.filter_rows((mt.pheno_call_stats.AC[0] != 1) &
                             (mt.pheno_call_stats.AC[1] >= 2)
