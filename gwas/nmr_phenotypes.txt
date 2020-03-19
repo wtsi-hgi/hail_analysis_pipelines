@@ -1,0 +1,3 @@
+['nmr_glc']
+['nmr_pyr']
+['nmr_acace']
