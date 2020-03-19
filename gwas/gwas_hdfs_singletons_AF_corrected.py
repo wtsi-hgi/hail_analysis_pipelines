@@ -142,19 +142,20 @@ if __name__ == "__main__":
     nmr2_new=[]
     print("Linear regression")
 
-    for group in phenotypes_to_run:
+    for phenotype in phenotypes_to_run:
 
         print("Original group")
-        print(group)
+        print(phenotype)
         for pheno in ph1:
             if pheno.startswith('nmr'):
-                if pheno in group:
+                if pheno in phenotype:
                     nmr_new.append(mt.phenotype[pheno])
                     nmr2_new.append(pheno)
+
         print("No running gwas with these phenotypes:")
         print(nmr2_new)
-        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[pheno]), hl.agg.call_stats(mt.GT, mt.alleles)))
-        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(mt.phenotype[pheno]), hl.agg.count_where(mt.GT.is_het())))
+        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.call_stats(mt.GT, mt.alleles)))
+        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.count_where(mt.GT.is_het())))
         ## Applying MAF filter -- basically removing singletones and alternative AC = 0
         mt = mt.filter_rows((mt.pheno_call_stats.AC[0] != 1) &
                             (mt.pheno_call_stats.AC[1] >= 2)
@@ -163,6 +164,7 @@ if __name__ == "__main__":
         gwas = hl.linear_regression_rows(
             y=nmr_new[0],
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
+
         fields_to_drop = ['sum_x', 'y_transpose_x','t_stat' ]
         gwas_table=gwas.drop(*fields_to_drop)
         gwas_table=gwas_table.annotate(nmr_phenotypes=nmr2_new[0])
