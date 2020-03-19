@@ -138,36 +138,39 @@ if __name__ == "__main__":
     with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotypes.txt", 'r') as f:
         phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
 
+    working_pheno_group=[]
     nmr_new=[]
     nmr2_new=[]
+    working_pheno_group_names=[]
     print("Linear regression")
-
-    for phenotype in phenotypes_to_run:
+    for pheno in ph1:
+        if pheno in phenotypes_to_run:
+            working_pheno_group.append(mt.phenotype[pheno])
+            working_pheno_group_names.append(pheno)
+    
+    for index, phenotype in enumerate(working_pheno_group):
        
         print("Original group")
         print(phenotype)
-        for pheno in ph1:
-            if pheno in phenotype:
-                nmr_new.append(mt.phenotype[pheno])
-                nmr2_new.append(pheno)
+        
 
         print("No running gwas with these phenotypes:")
-        print(nmr2_new)
+        print(working_pheno_group_names[index])
         mt=mt_ori
-        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(nmr_new[0]), hl.agg.call_stats(mt.GT, mt.alleles)))
-        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(nmr_new[0]), hl.agg.count_where(mt.GT.is_het())))
+        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.call_stats(mt.GT, mt.alleles)))
+        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.count_where(mt.GT.is_het())))
         ## Applying MAF filter -- basically removing singletones and alternative AC = 0
         mt = mt.filter_rows((mt.pheno_call_stats.AC[0] != 1) &
                             (mt.pheno_call_stats.AC[1] >= 2)
                            )
 
         gwas = hl.linear_regression_rows(
-            y=nmr_new[0],
+            y=working_pheno_group[index],
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
 
         fields_to_drop = ['sum_x', 'y_transpose_x','t_stat' ]
         gwas_table=gwas.drop(*fields_to_drop)
-        gwas_table=gwas_table.annotate(nmr_phenotypes=nmr2_new[0])
+        gwas_table=gwas_table.annotate(nmr_phenotypes=working_pheno_group_names[index])
         gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
         gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
         #gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
@@ -195,8 +198,7 @@ if __name__ == "__main__":
             q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
             output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-QQplot.html", mode='inline')
             save(q)
-        nmr_new=[]
-        nmr2_new=[]
+
             
         
 
