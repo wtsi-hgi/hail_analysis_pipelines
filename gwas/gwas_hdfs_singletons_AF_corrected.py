@@ -88,7 +88,7 @@ if __name__ == "__main__":
     print("Annotating matrixtable with phenotypes:")
     phenotypes=phenotypes.key_by('ID')
     mt = mt.annotate_cols(phenotype=phenotypes[mt.s])
-
+    mt_ori = mt
 
     #########################
     working_pheno_group="nmr"
@@ -143,17 +143,17 @@ if __name__ == "__main__":
     print("Linear regression")
 
     for phenotype in phenotypes_to_run:
-
+       
         print("Original group")
         print(phenotype)
         for pheno in ph1:
-            if pheno.startswith('nmr'):
-                if pheno in phenotype:
-                    nmr_new.append(mt.phenotype[pheno])
-                    nmr2_new.append(pheno)
+            if pheno in phenotype:
+                nmr_new.append(mt.phenotype[pheno])
+                nmr2_new.append(pheno)
 
         print("No running gwas with these phenotypes:")
         print(nmr2_new)
+        mt=mt_ori
         mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(nmr_new[0]), hl.agg.call_stats(mt.GT, mt.alleles)))
         mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(nmr_new[0]), hl.agg.count_where(mt.GT.is_het())))
         ## Applying MAF filter -- basically removing singletones and alternative AC = 0
