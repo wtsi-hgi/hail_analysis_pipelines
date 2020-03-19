@@ -59,6 +59,25 @@ pcas_names=[]
 covariates_array=[]
 covariates_names=[]
 
+def GWAS_for_nmr(mt):
+    pcas=[]
+    pcas_names=[]
+    covariates_array=[]
+    covariates_names=[]
+    ph1=list(mt.phenotype)
+
+    for pheno in ph1:
+        if pheno =='BWA' or pheno =='Study' or pheno == "Recruitment_Centre":
+            covariates_array.append(hl.float64(mt.phenotype[pheno]))
+            covariates_names.append(pheno)
+        if pheno.startswith('PC'):
+            pcas.append(mt.phenotype[pheno])
+            pcas_names.append(pheno)
+    
+    covariates_array=pcas+covariates_array
+    covariates_names=pcas_names+covariates_names
+    return covariates_array
+
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -91,15 +110,11 @@ if __name__ == "__main__":
     mt_ori = mt
 
     #########################
-    working_pheno_group="nmr"
+    running_group="nmr"
     ########################
     print("Grouping the phenotypes into lists:")
     ph1=list(mt.phenotype)
     for pheno in ph1:
-        if working_pheno_group == "nmr":
-            if pheno =='BWA' or pheno =='Study' or pheno == "Recruitment_Centre":
-                covariates_array.append(hl.float64(mt.phenotype[pheno]))
-                covariates_names.append(pheno)
         if pheno.startswith('somalogic'):
             somalogic_proteomics.append(mt.phenotype[pheno])
             somalogic2.append(pheno)
@@ -136,7 +151,7 @@ if __name__ == "__main__":
         
 
     with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotypes.txt", 'r') as f:
-        phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
+        phenotypes_to_run=[line.strip() for line in f]
 
     working_pheno_group=[]
     nmr_new=[]
@@ -148,29 +163,33 @@ if __name__ == "__main__":
             working_pheno_group.append(mt.phenotype[pheno])
             working_pheno_group_names.append(pheno)
     
-    for index, phenotype in enumerate(working_pheno_group):
+    print("The script will run for these phenotypes:")
+    print(working_pheno_group)
+    print(working_pheno_group_names)
+
+    for index, pheno_name in enumerate(working_pheno_group_names):
        
-        print("Original group")
-        print(phenotype)
-        
+        print("phenotype name")
+        print(pheno_name)
+            
 
         print("No running gwas with these phenotypes:")
-        print(working_pheno_group_names[index])
+        print(pheno_name)
         mt=mt_ori
-        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.call_stats(mt.GT, mt.alleles)))
-        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(mt.phenotype[phenotype]), hl.agg.count_where(mt.GT.is_het())))
-        ## Applying MAF filter -- basically removing singletones and alternative AC = 0
+        mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[pheno_name]), hl.agg.call_stats(mt.GT, mt.alleles)))
+        mt = mt.annotate_rows(pheno_n_het = hl.agg.filter(hl.is_defined(mt.phenotype[pheno_name]), hl.agg.count_where(mt.GT.is_het())))
         mt = mt.filter_rows((mt.pheno_call_stats.AC[0] != 1) &
-                            (mt.pheno_call_stats.AC[1] >= 2)
-                           )
+                                (mt.pheno_call_stats.AC[1] >= 2)
+                            )
+
+        covariates_array=GWAS_for_nmr(mt)
 
         gwas = hl.linear_regression_rows(
-            y=working_pheno_group[index],
-            x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
-
+                y=mt.phenotype[pheno_name],
+                x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
         fields_to_drop = ['sum_x', 'y_transpose_x','t_stat' ]
         gwas_table=gwas.drop(*fields_to_drop)
-        gwas_table=gwas_table.annotate(nmr_phenotypes=working_pheno_group_names[index])
+        gwas_table=gwas_table.annotate(nmr_phenotypes=pheno_name)
         gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
         gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
         #gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
@@ -183,21 +202,22 @@ if __name__ == "__main__":
         gwas_table=gwas_table.key_by('locus')
         gwas_table=gwas_table.drop('alleles')
         gwas_table=gwas_table.select('rsid','REF','ALT','n', 'AF', 'beta', 'standard_error', 'p_value','nmr_phenotypes', 'n_HomRef','n_Het', 'n_HomAlt' )
+        
         print(" Writing gwas table checkpoint")
         
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{nmr2_new[0]}.table", overwrite=True)
+        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{pheno_name}.table", overwrite=True)
         
         print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{nmr2_new[0]}.tsv.bgz", header=True)
-        for j in range(len(nmr_new)):
-            print(f"Plotting manhattan {j}:{nmr2_new[j]}")
-            p = hl.plot.manhattan(gwas.p_value, title=f"{nmr2_new[j]} GWAS")
-            output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-manhattan.html", mode='inline')
-            save(p)
-            print(f"Plotting QQ plot for {j} - {nmr2_new[j]}")    
-            q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{nmr2_new[j]} QQ plot")
-            output_file(f"{temp_dir}/gwas/{project}-{dataset}-{nmr2_new[j]}-QQplot.html", mode='inline')
-            save(q)
+        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{pheno_name}.tsv.bgz", header=True)
+
+        print(f"Plotting manhattan {index}:{pheno_name}")
+        p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
+        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}_{index}-manhattan.html", mode='inline')
+        save(p)
+        print(f"Plotting QQ plot for {index} - {pheno_name}")    
+        q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
+        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}_{index}-QQplot.html", mode='inline')
+        save(q)
 
             
         
