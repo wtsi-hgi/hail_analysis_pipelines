@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #locus   alleles rsid    n       beta    standard_error  p_value nmr_phenotypes  REF     ALT     AF
     #locus   rsid    REF     ALT     n       AF      beta    standard_error  p_value nmr_phenotypes
     
-    df = pd.read_csv(args.table, delimiter="\t", names=colnames, compression='gzip',  low_memory=False)
+    df = pd.read_csv(args.table, delimiter="\t", compression='gzip',  low_memory=False)
     df=df.drop_duplicates()
     
     p = os.path.join(outpath, "INT-WGS-gwas-nmr-{}.removed_dups.tsv.gz".format(id_out))
