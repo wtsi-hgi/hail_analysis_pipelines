@@ -126,7 +126,7 @@ if __name__ == "__main__":
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
     #make sure the input file has no empty line at the end 
-    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotype_clusters_singletons_redo.txt", 'r') as f:
+    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/nmr_phenotype_clusters_singletons_redo.txt", 'r') as f:
         phenotypes_to_run=[ast.literal_eval(line.strip()) for line in f]
 
     nmr_new=[]
@@ -134,6 +134,7 @@ if __name__ == "__main__":
     print("Linear regression")
 
     for group in phenotypes_to_run:
+      
         print("Original group")
         print(group)
         for pheno in ph1:
@@ -153,6 +154,7 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(REF=gwas_table.alleles[0])
         gwas_table=gwas_table.annotate(ALT=gwas_table.alleles[1])
         gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
+
         gwas_table=gwas_table.key_by('locus')
         gwas_table=gwas_table.drop('alleles')
         gwas_table=gwas_table.select('rsid','REF','ALT','n', 'AF', 'beta', 'standard_error', 'p_value','nmr_phenotypes')
