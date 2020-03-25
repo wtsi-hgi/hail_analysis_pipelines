@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     CHROMOSOME="WGS"
 
-    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/gwas/phenotype_lists/olink_phenotype_names.txt", "w")
+    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olink_phenotype_names.txt", "w")
     mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt")
     
     print("Number of initial variants:")
