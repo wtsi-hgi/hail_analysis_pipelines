@@ -105,6 +105,9 @@ def GWAS_for_olink(mt, groupname):
             pcas_names.append(pheno)
     covariates_array=pcas+covariates_array
     covariates_names=pcas_names+covariates_names
+
+    print("The covariates are:")
+    print(covariates_names)
     return covariates_array
 
 
@@ -181,7 +184,7 @@ if __name__ == "__main__":
     
         
     ###########################################
-    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkf.txt", 'r') as f:
+    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkinf.txt", 'r') as f:
         phenotypes_to_run=[line.strip() for line in f]
     ############################################
     working_pheno_group=[]
