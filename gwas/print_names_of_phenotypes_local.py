@@ -33,39 +33,6 @@ with open(f"{thresholds}", 'r') as f:
     thresholds = json.load(f)
 
 
-def print_clusters(phenotype_group, phenotype_name,filename):
-    print("**************************************************")
-    nmr_dict={}
-    #Create a dictionary with values a list of 1 if measurement in sample, 0 if not. 
-    #key is the phenotype
-    for index,value in enumerate(phenotype_group):
-        list1=value.collect()
-        list2=[0 if v is None else 1 for v in list1]
-        nmr_dict[phenotype_name[index]]=list2
-
-    dict1={}
-    namelist=[]
-    #convert each dictionary values in tuples
-    #if this tuple is already in the dictionary (same samples)
-    #append the phenotype name to the dictionary with key the tuple of measurements
-    #if it's not create a new key-value pair with 
-    for name, measurements in nmr_dict.items():
-
-        tuple1=tuple(measurements)
-
-        if tuple1 in dict1:
-            # append the new number to the existing array at this slot
-            dict1[tuple1].append(name)
-        else:
-            # create a new array in this slot
-            dict1[tuple1] = [name]
-
-    for key,value in dict1.items():
-   # print(str(key) + '=>'+ str(value) + '=>' + str(len(value)))
-        
-        print( str(value))
-        filename.write(str(value))
-        filename.write("\n")
 
 project="INT"
 dataset="WGS"
@@ -123,7 +90,7 @@ if __name__ == "__main__":
     CHROMOSOME="WGS"
 
     f = open(f"{temp_dir}/scripts/hail-pipelines-internal/gwas/phenotype_lists/olink_phenotype_names.txt", "w")
-    mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_february_2020_updated_rsID.mt")
+    mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt")
     
     print("Number of initial variants:")
     print(mt.count())
