@@ -78,21 +78,36 @@ def GWAS_for_nmr(mt):
     covariates_names=pcas_names+covariates_names
     return covariates_array
 
-def GWAS_for_olink(mt):
+def GWAS_for_olink(mt, groupname):
     pcas=[]
     pcas_names=[]
     covariates_array=[]
     covariates_names=[]
+    plate=""
     ph1=list(mt.phenotype)
+    if groupname=='olinkf':
+        plate='olinkinf_plate'
+    elif groupname =='olinkcvd2':
+        plate='olinkcvd2_plate'
+    elif groupname =='olinkcvd3':
+        plate='olinkcvd3_plate'
+    elif groupname =='olinkneu':
+        plate='olinkneu_plate'    
 
     for pheno in ph1:
-        #The covariates for Olink listed are PC 1-10, Recruitment Centre, Phase, Plate
-        if pheno =='BWA' or pheno =='Study' or pheno == "Recruitment_Centre":
+                
+        if pheno =='Study_BWA' or pheno == "Recruitment_Centre" or pheno == plate:
             covariates_array.append(hl.float64(mt.phenotype[pheno]))
             covariates_names.append(pheno)
+        
         if pheno.startswith('PC'):
             pcas.append(mt.phenotype[pheno])
             pcas_names.append(pheno)
+    covariates_array=pcas+covariates_array
+    covariates_names=pcas_names+covariates_names
+    return covariates_array
+
+
 
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
@@ -126,7 +141,7 @@ if __name__ == "__main__":
     mt_ori = mt
 
     #########################
-    running_group="nmr"
+    running_group="olinkf"
     ########################
     print("Grouping the phenotypes into lists:")
     ph1=list(mt.phenotype)
@@ -166,7 +181,7 @@ if __name__ == "__main__":
     
         
     ###########################################
-    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olink_phenotypes.txt", 'r') as f:
+    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkf.txt", 'r') as f:
         phenotypes_to_run=[line.strip() for line in f]
     ############################################
     working_pheno_group=[]
@@ -198,7 +213,10 @@ if __name__ == "__main__":
                                 (mt.pheno_call_stats.AC[1] >= 2)
                             )
 
-        covariates_array=GWAS_for_nmr(mt)
+        #covariates_array=GWAS_for_nmr(mt)
+        #######################################
+        covariates_array=GWAS_for_olink(mt, running_group)
+        #######################################
 
         gwas = hl.linear_regression_rows(
                 y=mt.phenotype[pheno_name],
