@@ -78,6 +78,22 @@ def GWAS_for_nmr(mt):
     covariates_names=pcas_names+covariates_names
     return covariates_array
 
+def GWAS_for_olink(mt):
+    pcas=[]
+    pcas_names=[]
+    covariates_array=[]
+    covariates_names=[]
+    ph1=list(mt.phenotype)
+
+    for pheno in ph1:
+        #The covariates for Olink listed are PC 1-10, Recruitment Centre, Phase, Plate
+        if pheno =='BWA' or pheno =='Study' or pheno == "Recruitment_Centre":
+            covariates_array.append(hl.float64(mt.phenotype[pheno]))
+            covariates_names.append(pheno)
+        if pheno.startswith('PC'):
+            pcas.append(mt.phenotype[pheno])
+            pcas_names.append(pheno)
+
 if __name__ == "__main__":
     #need to create spark cluster first before intiialising hail
     sc = pyspark.SparkContext()
@@ -149,10 +165,10 @@ if __name__ == "__main__":
 
     
         
-
-    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/nmr_phenotypes.txt", 'r') as f:
+    ###########################################
+    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olink_phenotypes.txt", 'r') as f:
         phenotypes_to_run=[line.strip() for line in f]
-
+    ############################################
     working_pheno_group=[]
     nmr_new=[]
     nmr2_new=[]
@@ -173,7 +189,7 @@ if __name__ == "__main__":
         print(pheno_name)
             
 
-        print("No running gwas with these phenotypes:")
+        print("Now running gwas with these phenotypes:")
         print(pheno_name)
         mt=mt_ori
         mt = mt.annotate_rows(pheno_call_stats = hl.agg.filter(hl.is_defined(mt.phenotype[pheno_name]), hl.agg.call_stats(mt.GT, mt.alleles)))
@@ -201,7 +217,8 @@ if __name__ == "__main__":
         gwas_table=gwas_table.annotate(n_HomAlt=mt.rows()[gwas_table.locus, gwas_table.alleles].pheno_call_stats.homozygote_count[1])
         gwas_table=gwas_table.key_by('locus')
         gwas_table=gwas_table.drop('alleles')
-        gwas_table=gwas_table.select('rsid','REF','ALT','n', 'AF', 'beta', 'standard_error', 'p_value','nmr_phenotypes', 'n_HomRef','n_Het', 'n_HomAlt' )
+        gwas_table = gwas_table.rename({'n' : 'n_pheno'})
+        gwas_table=gwas_table.select('rsid','REF','ALT', 'AF', 'beta', 'standard_error', 'p_value', 'AC', 'AN', 'n_HomRef','n_Het', 'n_HomAlt','n_pheno', 'nmr_phenotypes')
         
         print(" Writing gwas table checkpoint")
         
