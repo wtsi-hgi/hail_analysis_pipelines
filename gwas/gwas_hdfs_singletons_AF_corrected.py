@@ -243,18 +243,18 @@ if __name__ == "__main__":
         
         print(" Writing gwas table checkpoint")
         
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{pheno_name}.table", overwrite=True)
+        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table", overwrite=True)
         
         print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-nmr-{pheno_name}.tsv.bgz", header=True)
+        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group-{pheno_name}.tsv.bgz", header=True)
 
         print(f"Plotting manhattan {index}:{pheno_name}")
         p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
-        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}_{index}-manhattan.html", mode='inline')
+        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}-manhattan.html", mode='inline')
         save(p)
         print(f"Plotting QQ plot for {index} - {pheno_name}")    
         q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
-        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}_{index}-QQplot.html", mode='inline')
+        output_file(f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}-QQplot.html", mode='inline')
         save(q)
 
             
