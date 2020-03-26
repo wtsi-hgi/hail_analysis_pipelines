@@ -246,7 +246,7 @@ if __name__ == "__main__":
         gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table", overwrite=True)
         
         print("Exporting tsv table")
-        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group-{pheno_name}.tsv.bgz", header=True)
+        gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.tsv.bgz", header=True)
 
         print(f"Plotting manhattan {index}:{pheno_name}")
         p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
