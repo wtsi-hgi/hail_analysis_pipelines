@@ -85,7 +85,7 @@ def GWAS_for_olink(mt, groupname):
     covariates_names=[]
     plate=""
     ph1=list(mt.phenotype)
-    if groupname=='olinkf':
+    if groupname=='olinkinf':
         plate='olinkinf_plate'
     elif groupname =='olinkcvd2':
         plate='olinkcvd2_plate'
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     mt_ori = mt
 
     #########################
-    running_group="olinkf"
+    running_group="olinkinf"
     ########################
     print("Grouping the phenotypes into lists:")
     ph1=list(mt.phenotype)
