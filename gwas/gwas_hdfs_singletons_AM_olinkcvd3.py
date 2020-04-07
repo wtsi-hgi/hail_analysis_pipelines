@@ -184,7 +184,7 @@ if __name__ == "__main__":
     
         
     ###########################################
-    with open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkcvd3.txt", 'r') as f:
+    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkcvd3.txt", 'r') as f:
         phenotypes_to_run=[line.strip() for line in f]
     ############################################
     working_pheno_group=[]
