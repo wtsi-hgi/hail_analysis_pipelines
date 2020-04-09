@@ -133,8 +133,8 @@ if __name__ == "__main__":
     #dbsnp_rows = dbsnp.rows()
 
     CHROMOSOME="WGS"
-    #mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt")
-    mt = hl.read_matrix_table("s3a://intervalwgs/wgs-matrixtable/WGS_final_march_2020_dbsnp_v53.mt")
+    mt = hl.read_matrix_table(f"{temp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt")
+    #mt = hl.read_matrix_table("s3a://intervalwgs/wgs-matrixtable/WGS_final_march_2020_dbsnp_v53.mt")
     print("Number of initial variants:")
     print(mt.count())
     
