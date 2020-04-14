@@ -1,8 +1,3 @@
-olinkcvd2_kim1___q96d42
-olinkcvd2_thbs2___p35442
-olinkcvd2_tm___p07204
-olinkcvd2_vsig2___q96iq7
-olinkcvd2_ambp___p02760
 olinkcvd2_prelp___p51888
 olinkcvd2_ho1___p09601
 olinkcvd2_xcl1___p47992
