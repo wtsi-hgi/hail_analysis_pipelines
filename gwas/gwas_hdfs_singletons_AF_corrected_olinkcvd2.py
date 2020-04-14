@@ -243,7 +243,7 @@ if __name__ == "__main__":
         
         print(" Writing gwas table checkpoint")
         
-        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table", overwrite=True)
+        #gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table", overwrite=True)
         
         print("Exporting tsv table")
         gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.tsv.bgz", header=True)
