@@ -243,7 +243,7 @@ if __name__ == "__main__":
         
         print(" Writing gwas table checkpoint")
         
-        #gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table", overwrite=True)
+        gwas = gwas_table.checkpoint(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table", overwrite=True)
         
         print("Exporting tsv table")
         gwas.export(f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.tsv.bgz", header=True)
@@ -258,14 +258,4 @@ if __name__ == "__main__":
         save(q)
 
             
-        
-
-        
-            # print(f"Plotting manhattan plot for {index} - {pheno_name}")
-            # p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
-            # output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{i}-manhattanplot.html", mode='inline')
-            # save(p)
-            # print(f"Plotting QQ plot for {index} - {pheno_name}")    
-            # q = hl.plot.qq(gwas.p_value, collect_all=False, n_divisions=100, title=f"{pheno_name} QQ plot")
-            # output_file(f"{temp_dir}/gwas/{project}-{dataset}-{index}-{i}-QQplot.html", mode='inline')
-            # save(q)
+ 
