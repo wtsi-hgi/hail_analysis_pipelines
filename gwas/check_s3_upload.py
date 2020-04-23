@@ -36,7 +36,7 @@ print(len(missing_files))
 # print(allpaths)
 # print(filename)
 
-fofn = "s3cmdsfofn"
+fofn = "/opt/sanger.ac.uk/hgi/hail/tmp/scripts/hail-pipelines-internal/hail_analysis_pipelines/s3cmdsfofn"
 f = open(fofn, "r")
 lines = f.readlines()
 s3indices = []
