@@ -36,7 +36,16 @@ print(len(missing_files))
 # print(allpaths)
 # print(filename)
 
+fofn = "s3cmdsfofn"
+f = open(fofn, "r")
+lines = f.readlines()
+s3indices = []
+for x in lines:
+    m = re.search(r' \/opt\/sanger\.ac\.uk\/hgi\/hail\/tmp\/intervalwgs\/WGS\_final\_march\_2020\_dbsnp\_v53\.mt\/entries\/rows\/parts/part-(\d+)-(\d+)-(\d+)-(.*)', x)
+    if m:
 
+        if int(m.group(1)) in missing_files:
+            print(x)
 #data = list(filter(None, data))
 # print(data)
 # with open('/Users/pa10/Programming/gwas_display_app/public/data/data.json', 'w') as fout:
