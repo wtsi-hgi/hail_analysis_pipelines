@@ -13,6 +13,8 @@ from pathlib import Path
 from bokeh.plotting import output_file, save, show
 from datetime import datetime
 import ast
+from hail.utils.java import Env
+
 
 project_root = Path(__file__).parent.parent.parent
 print(project_root)
@@ -128,7 +130,8 @@ if __name__ == "__main__":
 
     hadoop_config.set("fs.s3a.access.key", credentials["mer"]["access_key"])
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
-
+    hadoop_config = Env().hc().sc._jsc.hadoopConfiguration()
+    hadoop_config.set("fs.s3a.connection.maximum", "1000")
     phenotypes = hl.import_table(
         "s3a://intervalwgs-qc/phenotypes_wgs_wes_fbc_sysmex_nmr_olink_somalogic_50-wes-removed_27-03-2020.csv", impute=True, delimiter=',')
     #dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',skip_invalid_loci=True)
