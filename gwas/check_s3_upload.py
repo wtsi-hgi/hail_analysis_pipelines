@@ -32,6 +32,7 @@ f.close()
 
 missing_files = find_missing(s3indices)
 pp.pprint(missing_files)
+print(len(missing_files))
 # print(allpaths)
 # print(filename)
 
