@@ -16,7 +16,7 @@ def find_missing(lst):
 
 
 #filepaths = "/Users/pa10/Programming/hail_pipeline_github/entries_rows.txt"
-filepaths = "/opt/sanger.ac.uk/hgi/hail/tmp/entries_rows.txt"
+filepaths = "/opt/sanger.ac.uk/hgi/hail/tmp/scripts/hail-pipelines-internal/entries_rows.txt"
 #allpaths = [p for p in pathlib.Path(plots_path).iterdir() if p.is_file()]
 f = open(filepaths, "r")
 lines = f.readlines()
