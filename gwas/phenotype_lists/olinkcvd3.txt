@@ -1,15 +1,3 @@
-olinkcvd3_tnfrsf14___q92956
-olinkcvd3_ldlreceptor___p01130
-olinkcvd3_itgb2___p05107
-olinkcvd3_il17ra___q96f46
-olinkcvd3_tnfr2___p20333
-olinkcvd3_mmp9___p14780
-olinkcvd3_ephb4___p54760
-olinkcvd3_il2ra___p01589
-olinkcvd3_opg___o00300
-olinkcvd3_alcam___q13740
-olinkcvd3_tff3___q07654
-olinkcvd3_selp___p16109
 olinkcvd3_cstb___p04080
 olinkcvd3_mcp1___p13500
 olinkcvd3_cd163___q86vb7
