@@ -133,10 +133,13 @@ if __name__ == "__main__":
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
     hadoop_config = Env().hc().sc._jsc.hadoopConfiguration()
     hadoop_config.set("fs.s3a.connection.maximum", "1000")
-    gwas = hl.read_table(
-        f'{tmp_dir}/gwas/INT-WGS-gwas-olinkcvd2-olinkcvd2_bmp6___p22004.tsv.bgz')
+
+    running_group = "olinkcvd2"
     index = 1
     pheno_name = "olinkcvd2_bmp6___p22004"
+    gwas = hl.read_table(
+        f"{tmp_dir}/gwas/{project}-{dataset}-gwas-{running_group}-{pheno_name}.table")
+
     print(f"Plotting manhattan {index}:{pheno_name}")
     p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
     output_file(
