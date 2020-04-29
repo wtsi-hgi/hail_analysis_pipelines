@@ -122,6 +122,7 @@ if __name__ == "__main__":
     # Define the hail persistent storage directory
     tmp_dir = "hdfs://spark-master:9820/"
     temp_dir = "file:///home/ubuntu/data"
+    plot_dir="/home/ubuntu/data"
     now = datetime.now()
 
     hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
@@ -143,11 +144,11 @@ if __name__ == "__main__":
     print(f"Plotting manhattan {index}:{pheno_name}")
     p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
     output_file(
-        f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}-manhattan.html", mode='inline')
+        f"{plot_dir}/gwas/{project}-{dataset}-{pheno_name}-manhattan.html", mode='inline')
     save(p)
     print(f"Plotting QQ plot for {index} - {pheno_name}")
     q = hl.plot.qq(gwas.p_value, collect_all=False,
                    n_divisions=100, title=f"{pheno_name} QQ plot")
     output_file(
-        f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}-QQplot.html", mode='inline')
+        f"{plot_dir}/gwas/{project}-{dataset}-{pheno_name}-QQplot.html", mode='inline')
     save(q)
