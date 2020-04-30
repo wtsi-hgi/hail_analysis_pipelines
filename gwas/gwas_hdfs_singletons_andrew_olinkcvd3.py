@@ -121,6 +121,7 @@ if __name__ == "__main__":
     # Define the hail persistent storage directory
     tmp_dir = "hdfs://spark-master:9820/"
     temp_dir = "file:///home/ubuntu/data"
+    plot_dir = "/home/ubuntu/data"
     now = datetime.now()
 
     hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
@@ -151,7 +152,7 @@ if __name__ == "__main__":
     mt_ori = mt
 
     #########################
-    running_group = "olinkcvd2"
+    running_group = "olinkcvd3"
     ########################
     print("Grouping the phenotypes into lists:")
     ph1 = list(mt.phenotype)
@@ -189,7 +190,7 @@ if __name__ == "__main__":
     # make sure the input file has no empty line at the end
 
     ###########################################
-    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkcvd2_1.txt", 'r') as f:
+    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/olinkcvd3_part2.txt", 'r') as f:
         phenotypes_to_run = [line.strip() for line in f]
     ############################################
     working_pheno_group = []
@@ -266,13 +267,13 @@ if __name__ == "__main__":
         print(f"Plotting manhattan {index}:{pheno_name}")
         p = hl.plot.manhattan(gwas.p_value, title=f"{pheno_name} GWAS")
         output_file(
-            f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}-manhattan.html", mode='inline')
+            f"{plot_dir}/gwas/{project}-{dataset}-{pheno_name}-manhattan.html", mode='inline')
         save(p)
         print(f"Plotting QQ plot for {index} - {pheno_name}")
         q = hl.plot.qq(gwas.p_value, collect_all=False,
                        n_divisions=100, title=f"{pheno_name} QQ plot")
         output_file(
-            f"{temp_dir}/gwas/{project}-{dataset}-{pheno_name}-QQplot.html", mode='inline')
+            f"{plot_dir}/gwas/{project}-{dataset}-{pheno_name}-QQplot.html", mode='inline')
         save(q)
 
         # print(f"Plotting manhattan plot for {index} - {pheno_name}")
