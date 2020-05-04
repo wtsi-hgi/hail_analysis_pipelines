@@ -240,7 +240,7 @@ if __name__ == "__main__":
 
         # covariates_array=GWAS_for_nmr(mt)
         #######################################
-        covariates_array = GWAS_for_fbc(mt, running_group)
+        covariates_array = GWAS_for_fbc(mt)
         #######################################
 
         gwas = hl.linear_regression_rows(
