@@ -1,3 +1,5 @@
+sysmex_DELTA_HGB
+sysmex_adj_PLT_F_Xch
 sysmex_adj_PLT_F_Ych
 sysmex_adj_PLT_F_Zch
 sysmex_adj_PF_PLTF_WX
