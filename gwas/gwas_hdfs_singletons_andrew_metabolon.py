@@ -282,7 +282,7 @@ if __name__ == "__main__":
         gwas_table = gwas_table.drop('alleles')
         gwas_table = gwas_table.rename({'n': 'n_pheno'})
         gwas_table = gwas_table.select('rsid', 'REF', 'ALT', 'AF', 'beta', 'standard_error',
-                                       'p_value', 'AC', 'AN', 'n_HomRef', 'n_Het', 'n_HomAlt', 'n_pheno', 'nmr_phenotypes')
+                                       'p_value', 'AC', 'AN', 'n_HomRef', 'n_Het', 'n_HomAlt', 'n_pheno', 'phenotypes')
 
         print(" Writing gwas table checkpoint")
 
