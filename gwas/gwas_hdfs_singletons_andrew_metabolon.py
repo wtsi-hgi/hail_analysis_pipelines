@@ -262,7 +262,7 @@ if __name__ == "__main__":
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
         fields_to_drop = ['sum_x', 'y_transpose_x', 't_stat']
         gwas_table = gwas.drop(*fields_to_drop)
-        gwas_table = gwas_table.annotate(nmr_phenotypes=pheno_name)
+        gwas_table = gwas_table.annotate(phenotypes=pheno_name)
         gwas_table = gwas_table.annotate(REF=gwas_table.alleles[0])
         gwas_table = gwas_table.annotate(ALT=gwas_table.alleles[1])
         #gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
