@@ -105,6 +105,9 @@ def GWAS_for_metabolon(mt, groupname):
 
     covariates_array = pcas+covariates_array
     covariates_names = pcas_names+covariates_names
+    print("The covariates are:")
+    print(covariates_names)
+    return covariates_array
     return covariates_array
 
 
