@@ -38,7 +38,7 @@ dataset = "WGS"
 
 nmr = []
 sysmex = []
-metabolon_metabolomics = []
+metabolon = []
 olink_inf = []
 olink_cvd2 = []
 olink_cvd3 = []
@@ -53,6 +53,7 @@ olink2_cvd2 = []
 olink2_cvd3 = []
 olink2_neu = []
 somalogic2 = []
+metabolon2 = []
 fbc2 = []
 pcas_names = []
 covariates_array = []
@@ -84,13 +85,13 @@ if __name__ == "__main__":
     hadoop_config.set("fs.s3a.secret.key", credentials["mer"]["secret_key"])
 
     phenotypes = hl.import_table(
-        "s3a://intervalwgs-qc/phenotypes_wgs_wes_fbc_sysmex_nmr_olink_somalogic_50-wes-removed_05-03-2020.csv", impute=True, delimiter=',')
+        "s3a://intervalwgs-qc/phenotypes_wgs_wes_fbc_sysmex_nmr_olink_somalogic_metabolon_addpheno_50-wes-removed_05-06-2020.csv", impute=True, delimiter=',')
     #dbsnp = hl.import_vcf("s3a://intervalwgs-qc/GCF_000001405.38.fixed.vcf.gz", force_bgz=True, reference_genome='GRCh38',skip_invalid_loci=True)
     #dbsnp_rows = dbsnp.rows()
 
     CHROMOSOME = "WGS"
 
-    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/fbc_sysmex_phenotype_names.txt", "w")
+    f = open(f"{temp_dir}/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/metabolon_names.txt", "w")
     mt = hl.read_matrix_table(
         f"{temp_dir}/intervalwgs/WGS_final_march_2020_dbsnp_v53.mt")
 
@@ -147,6 +148,9 @@ if __name__ == "__main__":
         elif pheno.startswith('fbc'):
             fbc.append(mt.phenotype[pheno])
             fbc2.append(pheno)
+        elif pheno.startswith('metabolon'):
+            metabolon.append(mt.phenotype[pheno])
+            metabolon2.append(pheno)
         elif pheno.startswith('PC'):
             pcas.append(mt.phenotype[pheno])
             pcas_names.append(pheno)
@@ -159,8 +163,8 @@ if __name__ == "__main__":
 
     #all_groups=[olink_inf, olink_cvd2,olink_cvd3,olink_neu]
     #all_names=[olink2_inf, olink2_cvd2,olink2_cvd3,olink2_neu]
-    all_groups = [fbc, sysmex]
-    all_names = [fbc2, sysmex2]
+    all_groups = [metabolon]
+    all_names = [metabolon2]
     for list_name in all_names:
         for phenotype in list_name:
             print(phenotype)
