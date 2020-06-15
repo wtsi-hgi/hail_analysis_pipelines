@@ -190,7 +190,7 @@ if __name__ == "__main__":
     # make sure the input file has no empty line at the end
 
     ###########################################
-    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/sysmex_part2.txt", 'r') as f:
+    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/sysmex_part1.txt", 'r') as f:
         phenotypes_to_run = [line.strip() for line in f]
     ############################################
     working_pheno_group = []
@@ -233,7 +233,7 @@ if __name__ == "__main__":
             x=mt.GT.n_alt_alleles(), covariates=[1.0]+covariates_array, pass_through=[mt.rsid])
         fields_to_drop = ['sum_x', 'y_transpose_x', 't_stat']
         gwas_table = gwas.drop(*fields_to_drop)
-        gwas_table = gwas_table.annotate(nmr_phenotypes=pheno_name)
+        gwas_table = gwas_table.annotate(phenotypes=pheno_name)
         gwas_table = gwas_table.annotate(REF=gwas_table.alleles[0])
         gwas_table = gwas_table.annotate(ALT=gwas_table.alleles[1])
         #gwas_table=gwas_table.annotate(AF=mt.rows()[gwas_table.locus, gwas_table.alleles].variant_QC_Hail.AF[1])
@@ -253,7 +253,7 @@ if __name__ == "__main__":
         gwas_table = gwas_table.drop('alleles')
         gwas_table = gwas_table.rename({'n': 'n_pheno'})
         gwas_table = gwas_table.select('rsid', 'REF', 'ALT', 'AF', 'beta', 'standard_error',
-                                       'p_value', 'AC', 'AN', 'n_HomRef', 'n_Het', 'n_HomAlt', 'n_pheno', 'nmr_phenotypes')
+                                       'p_value', 'AC', 'AN', 'n_HomRef', 'n_Het', 'n_HomAlt', 'n_pheno', 'phenotypes')
 
         print(" Writing gwas table checkpoint")
 
