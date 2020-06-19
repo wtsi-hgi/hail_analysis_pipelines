@@ -1,6 +1,4 @@
-metabolon_1105
 metabolon_1107
-metabolon_1114
 metabolon_1118
 metabolon_1121
 metabolon_1123
@@ -21,12 +19,9 @@ metabolon_1356
 metabolon_1358
 metabolon_1361
 metabolon_1365
-metabolon_1418
-metabolon_1437
 metabolon_1444
 metabolon_1493
 metabolon_1494
-metabolon_1498
 metabolon_1505
 metabolon_1508
 metabolon_1512
@@ -81,7 +76,6 @@ metabolon_1600
 metabolon_1604
 metabolon_1605
 metabolon_1642
-metabolon_1643
 metabolon_1644
 metabolon_1648
 metabolon_1649
@@ -89,9 +83,6 @@ metabolon_1669
 metabolon_1670
 metabolon_1712
 metabolon_1759
-metabolon_1769
-metabolon_17747
-metabolon_17769
 metabolon_17799
 metabolon_17805
 metabolon_17945
@@ -139,7 +130,6 @@ metabolon_21232
 metabolon_2125
 metabolon_2132
 metabolon_2133
-metabolon_2134
 metabolon_22001
 metabolon_22036
 metabolon_22053
@@ -279,7 +269,6 @@ metabolon_34389
 metabolon_34390
 metabolon_34393
 metabolon_34395
-metabolon_34396
 metabolon_34397
 metabolon_34399
 metabolon_34400
