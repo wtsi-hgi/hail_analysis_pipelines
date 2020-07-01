@@ -96,7 +96,7 @@ def GWAS_for_metabolon(mt, groupname):
     ph1 = list(mt.phenotype)
 
     for pheno in ph1:
-        if pheno == 'BWA' or pheno == 'Study' or pheno == batch:
+        if pheno == 'BWA' or pheno == 'Study' or pheno == 'Study_BWA' or pheno == batch:
             covariates_array.append(hl.float64(mt.phenotype[pheno]))
             covariates_names.append(pheno)
         if pheno.startswith('PC'):
