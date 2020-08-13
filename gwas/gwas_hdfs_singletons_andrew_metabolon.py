@@ -222,7 +222,7 @@ if __name__ == "__main__":
     # make sure the input file has no empty line at the end
 
     ###########################################
-    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/metabolon_error.txt", 'r') as f:
+    with open("/home/ubuntu/data/scripts/hail-pipelines-internal/hail_analysis_pipelines/gwas/phenotype_lists/metabolon_extra.txt", 'r') as f:
         phenotypes_to_run = [line.strip() for line in f]
     ############################################
     working_pheno_group = []
