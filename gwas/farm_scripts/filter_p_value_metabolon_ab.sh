@@ -2,7 +2,7 @@
 # bsub -q long -G hgi -R'select[mem>30000] rusage[mem=30000]' -M30000  -o fiilter_pvalue.o -e filter_pvalue.e  
 
 
-CHUNK=/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/final_results/gwas_tables/metabolon/xab_original
+CHUNK=/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_analysis/gwas/final_results/gwas_tables/metabolon/xab_orig
 folder=/lustre/scratch119/humgen/projects/interval_wgs/analysis/hail_analysis/gwas/final_results/gwas_tables/metabolon
 outfolder=${folder}/pvalue_filter
 mkdir -p ${outfolder}
