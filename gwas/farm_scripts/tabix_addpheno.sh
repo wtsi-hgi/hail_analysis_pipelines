@@ -8,5 +8,8 @@ mkdir -p $outdir
 
 for f in ${folder}/*.bed.gz
 do 
-tabix -p bed $f 
+fbname=$(basename "${FILE}" .bed.gz)
+gunzip $f | bgzip -c > ${outdir}/${fbname}.bed.bgz
+
+tabix -pbed ${outdir}/${fbname}.bed.bgz
 done
