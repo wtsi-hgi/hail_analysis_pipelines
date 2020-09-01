@@ -6,10 +6,10 @@ folder=/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/hail_anal
 outdir=${folder}
 mkdir -p $outdir
 
-for f in ${folder}/*.bed.gz
+for f in ${folder}/*.bed
 do 
-fbname=$(basename "${FILE}" .bed.gz)
-gzip -c -d $f | bgzip -c > ${outdir}/${fbname}.bed.bgz
+fbname=$(basename "${FILE}" .bed)
+bgzip -c $f > ${outdir}/${fbname}.bed.bgz
 
 tabix -pbed ${outdir}/${fbname}.bed.bgz
 done
