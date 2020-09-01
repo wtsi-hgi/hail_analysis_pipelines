@@ -8,5 +8,5 @@ mkdir -p $outdir
 
 for f in ${folder}/*.bed.gz
 do 
-tabix -p $f 
+tabix -p bed $f 
 done
