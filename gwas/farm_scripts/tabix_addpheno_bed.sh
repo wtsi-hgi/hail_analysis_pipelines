@@ -8,7 +8,7 @@ mkdir -p $outdir
 
 for f in ${folder}/*.bed
 do 
-fbname=$(basename "${FILE}" .bed)
+fbname=$(basename "${f}" .bed)
 bgzip -c $f > ${outdir}/${fbname}.bed.bgz
 
 tabix -pbed ${outdir}/${fbname}.bed.bgz
