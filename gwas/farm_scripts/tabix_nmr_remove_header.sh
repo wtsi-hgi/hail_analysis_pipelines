@@ -10,7 +10,7 @@ mkdir -p $outdir
 while read -r FILE; do
 	COUNT=$(( $COUNT + 1 ))
 	fbname=$(basename "${FILE}" .bed.bgz)
-    zgrep -v "^locus" | bgzip -c > ${outdir}/${fbname}_corrected.bed.bgz
+    zgrep -v "^locus" ${FILE} | bgzip -c > ${outdir}/${fbname}_corrected.bed.bgz
     tabix -pbed ${outdir}/${fbname}_corrected.bed.bgz
 	echo ${COUNT}
 done < "${CHUNK}"
