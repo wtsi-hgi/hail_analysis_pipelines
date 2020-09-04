@@ -173,7 +173,7 @@ if __name__ == "__main__":
     sc = pyspark.SparkContext()
     # Define the hail persistent storage directory
     tmp_dir = "hdfs://spark-master:9820/"
-    temp_dir = "file:///home/ubuntu/data"
+    temp_dir = "file:///home/ubuntu/data/tmp"
     plot_dir = "/home/ubuntu/data"
     now = datetime.now()
 
