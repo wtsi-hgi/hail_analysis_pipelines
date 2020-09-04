@@ -177,7 +177,7 @@ if __name__ == "__main__":
     plot_dir = "/home/ubuntu/data"
     now = datetime.now()
 
-    hl.init(sc=sc, tmp_dir=tmp_dir, default_reference="GRCh38")
+    hl.init(tmp_dir=tmp_dir, default_reference="GRCh38")
     # s3 credentials required for user to access the datasets in farm flexible compute s3 environment
     # you may use your own here from your .s3fg file in your home directory
     hadoop_config = sc._jsc.hadoopConfiguration()
