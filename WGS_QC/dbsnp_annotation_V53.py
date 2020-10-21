@@ -67,4 +67,4 @@ dbsnp_mt = dbsnp_mt.key_rows_by(
     'locus').distinct_by_row().key_rows_by('locus', 'alleles')
 dbsnp_mt = hl.split_multi_hts(dbsnp_mt)
 dbsnp_mt.write(f"{tmp_dir}/dbsnp_v53_split.mt", overwrite=True)
-dbsnp_mt.export_vcf(f"{tmp_dir}/dbsnp_v53_split.vcf.bgz", overwrite=True)
+hl.export_vcf(dbsnp_mt, f"{tmp_dir}/dbsnp_v53_split.vcf.bgz", overwrite=True)
