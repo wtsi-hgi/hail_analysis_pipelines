@@ -69,7 +69,7 @@ mt = hl.read_matrix_table(
 mt_chrX = mt.filter_rows(mt.locus.contig == "chrX")
 mt_chrX = mt_chrX.annotate_rows(rsid=dbsnp_v153.rows()[mt_chrX.row_key].rsid)
 mt_chrX = mt_chrX.checkpoint(f"{tmp_dir}/chrX_dbsnp_v153.mt", overwrite=True)
-mt_chrY = mt.filter_rows(mt.locus.contig == "chrX")
+mt_chrY = mt.filter_rows(mt.locus.contig == "chrY")
 mt_chrY = mt_chrY.annotate_rows(rsid=dbsnp_v153.rows()[mt_chrY.row_key].rsid)
 mt_chrY = mt_chrY.checkpoint(f"{tmp_dir}/chrY_dbsnp_v153.mt", overwrite=True)
 
