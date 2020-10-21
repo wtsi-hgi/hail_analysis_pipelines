@@ -23,17 +23,15 @@ logging.basicConfig(format="%(levelname)s (%(name)s %(lineno)s): %(message)s")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent.parent
 print(project_root)
 
-s3credentials = os.path.join(
-    project_root, "hail_configuration_files/s3_credentials.json")
+s3credentials = os.path.join(project_root, "config_files/s3_credentials.json")
 print(s3credentials)
 
-storage = os.path.join(project_root, "hail_configuration_files/storage.json")
+storage = os.path.join(project_root, "config_files/storage.json")
 
-thresholds = os.path.join(
-    project_root, "hail_configuration_files/thresholds.json")
+thresholds = os.path.join(project_root, "config_files/thresholds.json")
 
 with open(f"{s3credentials}", 'r') as f:
     credentials = json.load(f)
